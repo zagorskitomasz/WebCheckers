@@ -5,17 +5,16 @@
 
 	<groupId>com.webcheckers</groupId>
 	<artifactId>api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>api</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Web Checkers Server</name>
+	<description>Web Checkers Server API</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.5.9.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
@@ -29,12 +28,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -45,6 +38,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-
 </project>
