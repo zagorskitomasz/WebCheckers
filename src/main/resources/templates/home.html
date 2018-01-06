@@ -1,0 +1,19 @@
+<html>
+<head>
+</head>
+<body>Test body.
+<script>
+var url = 'ws://127.0.0.1:8080/table/websocket';
+var sock = new WebSocket(url);
+
+sock.onopen = function(){
+	console.log('opening');
+	sock.send("register me");
+}
+
+sock.onmessage = function(msg){
+	console.log(msg.data);
+}
+</script>
+</body>
+</html>
