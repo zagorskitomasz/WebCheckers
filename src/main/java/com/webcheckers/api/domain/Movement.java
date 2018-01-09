@@ -5,43 +5,43 @@ import java.util.Set;
 
 public class Movement {
 	
-	private Player player;
-	private String from;
-	private String to;
+	private Color player;
+	private Position from;
+	private Position to;
 	private Set<String> killed;
 	
 	public Movement() {
 		killed = new HashSet<>();
 	}
 	
-	public Movement(Player player, String from, String to) {
+	public Movement(Color player, Position from, Position to) {
 		this();
 		this.player = player;
 		this.from = from;
 		this.to= to;
 	}
 
-	public Player getPlayer() {
+	public Color getPlayerColor() {
 		return player;
 	}
 
-	public void setPlayer(Player player) {
+	public void setPlayerColor(Color player) {
 		this.player = player;
 	}
 
-	public String getFrom() {
+	public Position getFrom() {
 		return from;
 	}
 
-	public void setFrom(String from) {
+	public void setFrom(Position from) {
 		this.from = from;
 	}
 
-	public String getTo() {
+	public Position getTo() {
 		return to;
 	}
 
-	public void setTo(String to) {
+	public void setTo(Position to) {
 		this.to = to;
 	}
 
@@ -55,10 +55,5 @@ public class Movement {
 	
 	public void addKilled(String killedOne) {
 		killed.add(killedOne);
-	}
-	
-	@Override
-	public String toString() {
-		return "Player " + player + " moved from " + from + " to " + to + " killing " + killed.size() + " checkers.";
 	}
 }
