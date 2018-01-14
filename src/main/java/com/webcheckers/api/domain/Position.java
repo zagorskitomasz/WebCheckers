@@ -23,4 +23,21 @@ public class Position {
 	public boolean hasChecker() {
 		return checker != null;
 	}
+	
+	public Checker getChecker() {
+		return checker;
+	}
+	
+	@Override
+	public String toString() {
+		
+		if(checker == null)
+			return "_";
+		else if (checker.COLOR == Color.BLACK)
+			return "B";
+		else if (checker.COLOR == Color.WHITE)
+			return "W";
+		else
+			return " ";
+	}
 }

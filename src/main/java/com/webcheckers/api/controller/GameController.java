@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.webcheckers.api.domain.Movement;
-import com.webcheckers.api.domain.Color;
 import com.webcheckers.api.service.MessageService;
 
 @RestController
@@ -21,11 +20,8 @@ public class GameController {
 		
 		System.out.println("Incoming request for table " + table);
 		
-		Movement movement = new Movement(Color.WHITE, "B3", "D1");
-		movement.addKilled("C2");
-		
 		messageService.sendMessage();
 		
-		return movement;
+		return null;
 	}
 }
