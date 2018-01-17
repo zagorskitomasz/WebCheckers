@@ -1,5 +1,6 @@
 package com.webcheckers.api.domain;
 
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,5 +72,11 @@ public class Path {
 	
 	public int getLength() {
 		return path.size();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Position getLastPosition() {
+		Position lastPosition = ((Deque<Position>)path).peekLast();
+		return lastPosition;
 	}
 }
