@@ -10,6 +10,7 @@ public class Path {
 	private List<Checker> killed;
 	private boolean longest;
 	private boolean promoted;
+	private boolean toDelete;
 	
 	public Path() {
 		
@@ -74,9 +75,29 @@ public class Path {
 		return path.size();
 	}
 	
+	public boolean isToDelete() {
+		return toDelete;
+	}
+
+	public void setToDelete(boolean toDelete) {
+		this.toDelete = toDelete;
+	}
+
 	@SuppressWarnings("unchecked")
 	public Position getLastPosition() {
 		Position lastPosition = ((Deque<Position>)path).peekLast();
 		return lastPosition;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		for(Position position : path)
+			stringBuilder.append(position.X + " " + position.Y + " -> ");
+		
+		stringBuilder.append("killed: " + getStrength());
+		
+		return stringBuilder.toString();
 	}
 }

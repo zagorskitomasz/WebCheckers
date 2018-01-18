@@ -44,8 +44,9 @@ public class MovementValidator {
 		possibilities = new LinkedList<>();
 
 		initializePaths();
-		cleanPaths();
+		clearPaths();
 		checkNextStep();
+		clearPaths();
 	}
 
 	private void initializePaths() {
@@ -57,7 +58,7 @@ public class MovementValidator {
 		}
 	}
 	
-	private void cleanPaths() {
+	private void clearPaths() {
 		removeNotStrongEnough();
 		removeNotLongEnough();
 	}
@@ -90,11 +91,11 @@ public class MovementValidator {
 			examineLeft(possibility);
 			examineRight(possibility);
 		}
-		
 		appendNewPossibilities();
 	}
 
 	private void appendNewPossibilities() {
+		possibilities.removeIf(path -> path.isToDelete());
 		possibilities.addAll(newPossibilities);
 		newPossibilities = null;
 	}
@@ -124,8 +125,46 @@ public class MovementValidator {
 	}
 	
 	private void examinePath(Path originalPath, int xDir, int yDir) {
+		
+		if(originalPath.getLength() > 1 && originalPath.getStrength() == 0)
+			return;
+		
 		Position lastPosition = originalPath.getLastPosition();
-		//TODO
+		
+		int nextX = lastPosition.X + xDir;
+		int nextY = lastPosition.Y + yDir;
+		
+		if(nextX < 0 || nextX > 9 || nextY < 0 || nextY > 9)
+			return;
+		
+		Position nextPosition = board.getPosition(nextX, nextY);
+		if(originalPath.getStrength() == 0 && (nextPosition.getChecker() == null || originalPath.wouldBeKilled(nextPosition.getChecker()))){
+			
+			Path nextPath = originalPath.clone();
+			originalPath.setToDelete(true);
+			nextPath.addStep(nextPosition);
+			newPossibilities.add(nextPath);
+			return;
+		}
+		else if (nextPosition.getChecker().COLOR != playerColor){
+			
+			nextX = nextPosition.X + xDir;
+			nextY = nextPosition.Y + yDir;
+			
+			if(nextX < 0 || nextX > 9 || nextY < 0 || nextY > 9)
+				return;
+			
+			nextPosition = board.getPosition(nextX, nextY);
+			if(nextPosition.getChecker() == null || originalPath.wouldBeKilled(nextPosition.getChecker())){
+				
+				Path nextPath = originalPath.clone();
+				originalPath.setToDelete(true);
+				nextPath.addStep(nextPosition);
+				nextPath.addKilled(board.getPosition(lastPosition.X + xDir, lastPosition.Y + yDir).getChecker());
+				newPossibilities.add(nextPath);
+				return;
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -135,5 +174,6 @@ public class MovementValidator {
 		MovementValidator validator = new MovementValidator(board);
 		validator.canIStartWith(player, 0, 0);
 		System.out.println(board);
+		validator.possibilities.forEach(System.out::println);
 	}
 }
