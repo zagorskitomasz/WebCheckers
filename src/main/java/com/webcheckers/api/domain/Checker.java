@@ -17,6 +17,8 @@ public class Checker {
 	}
 	
 	public void moveTo(Position position) {
+		this.position.removeChecker();
+		position.insertChecker(this);
 		this.position = position;
 	}
 	

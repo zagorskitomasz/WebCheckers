@@ -44,9 +44,11 @@ public class MovementValidator {
 		possibilities = new LinkedList<>();
 
 		initializePaths();
-		clearPaths();
-		checkNextStep();
-		clearPaths();
+		
+		boolean keepRunning = true;
+		
+		while(keepRunning)
+			keepRunning = examineNextPathsLayer();
 	}
 
 	private void initializePaths() {
@@ -56,6 +58,20 @@ public class MovementValidator {
 			Path path = new Path(checker.getPosition());
 			possibilities.add(path);
 		}
+	}
+
+	private boolean examineNextPathsLayer() {
+	
+		boolean keepRunning = true;
+		checkNextStep();
+		
+		if(newPossibilities.size() == 0)
+			keepRunning = false;
+		
+		appendNewPossibilities();
+		clearPaths();
+		
+		return keepRunning;
 	}
 	
 	private void clearPaths() {
@@ -91,7 +107,6 @@ public class MovementValidator {
 			examineLeft(possibility);
 			examineRight(possibility);
 		}
-		appendNewPossibilities();
 	}
 
 	private void appendNewPossibilities() {
@@ -126,51 +141,93 @@ public class MovementValidator {
 	
 	private void examinePath(Path originalPath, int xDir, int yDir) {
 		
-		if(originalPath.getLength() > 1 && originalPath.getStrength() == 0)
+		if(madeDefensiveMove(originalPath))
 			return;
 		
 		Position lastPosition = originalPath.getLastPosition();
+		Position nextPosition = getNextPosition(lastPosition, xDir, yDir);
+		
+		if(nextPosition != null) {
+
+			if(canMoveDefensive(originalPath, nextPosition))
+				addNewPathBranch(originalPath, nextPosition, null);
+			
+			Position afterNextPosition = getNextPosition(nextPosition, xDir, yDir);
+
+			if(afterNextPosition != null) {
+
+				if (canMoveOffensive(originalPath, nextPosition, afterNextPosition))
+					addNewPathBranch(originalPath, afterNextPosition, nextPosition.getChecker());
+			}
+		}
+
+		nextPosition = getNextPosition(lastPosition, xDir, yDir * (-1));
+		if(nextPosition != null) {
+			
+			Position afterNextPosition = getNextPosition(nextPosition, xDir, yDir * (-1));
+
+			if(afterNextPosition != null) {
+
+				if (canMoveOffensive(originalPath, nextPosition, afterNextPosition))
+					addNewPathBranch(originalPath, afterNextPosition, nextPosition.getChecker());
+			}
+		}
+	}
+
+	private boolean madeDefensiveMove(Path originalPath) {
+		
+		return originalPath.getLength() > 1 && originalPath.getStrength() == 0;
+	}
+
+	private boolean canMoveDefensive(Path originalPath, Position nextPosition){
+		
+		return originalPath.getStrength() == 0 && 
+				(nextPosition.getChecker() == null || 
+				originalPath.wouldBeKilled(nextPosition.getChecker()));
+	}
+
+	private boolean canMoveOffensive(Path originalPath, Position nextPosition, Position afterNextPosition) {
+		
+		Checker toKill = nextPosition.getChecker();
+		
+		return toKill != null && 
+				toKill.COLOR != playerColor && 
+				!originalPath.wouldBeKilled(toKill) &&
+				(!afterNextPosition.hasChecker() || 
+						originalPath.wouldBeKilled(afterNextPosition.getChecker()));
+	}
+
+	private void addNewPathBranch(Path originalPath, Position nextPosition, Checker checker) {
+		
+		Path nextPath = originalPath.clone();
+		originalPath.setToDelete(true);
+		nextPath.addStep(nextPosition);
+		
+		if(checker != null)
+			nextPath.addKilled(checker);
+		
+		newPossibilities.add(nextPath);
+	}
+	
+	private Position getNextPosition(Position lastPosition, int xDir, int yDir) {
 		
 		int nextX = lastPosition.X + xDir;
 		int nextY = lastPosition.Y + yDir;
 		
 		if(nextX < 0 || nextX > 9 || nextY < 0 || nextY > 9)
-			return;
+			return null;
 		
-		Position nextPosition = board.getPosition(nextX, nextY);
-		if(originalPath.getStrength() == 0 && (nextPosition.getChecker() == null || originalPath.wouldBeKilled(nextPosition.getChecker()))){
-			
-			Path nextPath = originalPath.clone();
-			originalPath.setToDelete(true);
-			nextPath.addStep(nextPosition);
-			newPossibilities.add(nextPath);
-			return;
-		}
-		else if (nextPosition.getChecker().COLOR != playerColor){
-			
-			nextX = nextPosition.X + xDir;
-			nextY = nextPosition.Y + yDir;
-			
-			if(nextX < 0 || nextX > 9 || nextY < 0 || nextY > 9)
-				return;
-			
-			nextPosition = board.getPosition(nextX, nextY);
-			if(nextPosition.getChecker() == null || originalPath.wouldBeKilled(nextPosition.getChecker())){
-				
-				Path nextPath = originalPath.clone();
-				originalPath.setToDelete(true);
-				nextPath.addStep(nextPosition);
-				nextPath.addKilled(board.getPosition(lastPosition.X + xDir, lastPosition.Y + yDir).getChecker());
-				newPossibilities.add(nextPath);
-				return;
-			}
-		}
+		return board.getPosition(nextX, nextY);
 	}
 	
 	public static void main(String[] args) {
 		Board board = new Board();
 		Player player = new Player("Tomek");
 		player.initialize(Color.WHITE, null);
+		board.getChecker(1, 7).moveTo(board.getPosition(1, 3));
+		board.getChecker(0, 8).moveTo(board.getPosition(3, 5));
+		board.getChecker(5, 7).moveTo(board.getPosition(5, 5));
+		board.getChecker(2, 8).moveTo(board.getPosition(5, 7));
 		MovementValidator validator = new MovementValidator(board);
 		validator.canIStartWith(player, 0, 0);
 		System.out.println(board);
