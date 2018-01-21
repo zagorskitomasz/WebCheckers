@@ -27,7 +27,7 @@ public class MovementValidator {
 		position = board.getPosition(x, y);
 
 		if (!isPlayersChecker())
-			return false;
+			;//return false;
 
 		if (possibilities == null)
 			createPossibilities();
@@ -62,11 +62,9 @@ public class MovementValidator {
 
 	private boolean examineNextPathsLayer() {
 	
-		boolean keepRunning = true;
 		checkNextStep();
 		
-		if(newPossibilities.size() == 0)
-			keepRunning = false;
+		boolean	keepRunning = newPossibilities.size() > 0;
 		
 		appendNewPossibilities();
 		clearPaths();
@@ -103,14 +101,8 @@ public class MovementValidator {
 		if(newPossibilities == null)
 			newPossibilities = new LinkedList<>();
 		
-		for(Path possibility : possibilities) {
-			if(possibility.isPromoted())
-				examinePromotedPath(possibility);
-			else {
-				examineLeft(possibility);
-				examineRight(possibility);
-			}
-		}
+		for(Path possibility : possibilities) 
+			examinePath(possibility);
 	}
 
 	private void appendNewPossibilities() {
@@ -119,58 +111,24 @@ public class MovementValidator {
 		newPossibilities = null;
 	}
 	
-	private void examineLeft(Path possibility) {
-		int leftDirection = -1;
-		examinePath(possibility, leftDirection);
-	}
-	
-	private void examineRight(Path possibility) {
-		int rightDirection = 1;
-		examinePath(possibility, rightDirection);
-	}
-	
-	private void examinePath(Path originalPath, int direction) {
-		
-		if(playerColor == Color.WHITE)
-			examinePath(originalPath, direction, 1);
-		else
-			examinePath(originalPath, direction, -1);
-	}
-	
-	private void examinePromotedPath(Path originalPath) {
+	private void examinePath(Path originalPath) {
 		
 		if(madeDefensiveMove(originalPath))
 			return;
 		
-		examinePromotedNW(originalPath);
-		examinePromotedNE(originalPath);
-		examinePromotedSW(originalPath);
-		examinePromotedSE(originalPath);
+		examinePath(originalPath, -1, -1);
+		examinePath(originalPath, -1, 1);
+		examinePath(originalPath, 1, -1);
+		examinePath(originalPath, 1, 1);
 	}
 	
-	private void examinePromotedNW(Path originalPath) {
-		examinePromoted(originalPath, -1, -1);
-	}
-	
-	private void examinePromotedNE(Path originalPath) {
-		examinePromoted(originalPath, 1, -1);
-	}
-	
-	private void examinePromotedSW(Path originalPath) {
-		examinePromoted(originalPath, -1, 1);
-	}
-	
-	private void examinePromotedSE(Path originalPath) {
-		examinePromoted(originalPath, 1, 1);
-	}
-	
-	private void examinePromoted(Path originalPath, int xDir, int yDir) {
+	private void examinePath(Path originalPath, int xDir, int yDir) {
 		
 		Position lastPosition = originalPath.getLastPosition();
 		Position nextPosition = lastPosition;
-		boolean killed = false;
 		Checker toKill = null;
 		boolean blocked = false;
+		boolean promoted = originalPath.isPromoted();
 		
 		do {
 			nextPosition = getNextPosition(nextPosition, xDir, yDir);
@@ -178,61 +136,25 @@ public class MovementValidator {
 			if(nextPosition == null)
 				break;
 			
-			if(!nextPosition.hasChecker() || originalPath.wouldBeKilled(nextPosition.getChecker())) {
-				if(toKill != null) {
+			if(originalPath.isEmpty(nextPosition)) {
+				if(toKill != null) 
 					addNewPathBranch(originalPath, nextPosition, toKill);
-					killed = true;
-				}
-				else if(originalPath.getStrength() == 0)
+				else if(originalPath.canMoveDeffensively(yDir)) 
 					addNewPathBranch(originalPath, nextPosition, null);
+				blocked = !promoted;
 			}
 			
 			if(nextPosition.hasChecker()) {
-				if(nextPosition.getChecker().COLOR == playerColor)
+				if(isSameColor(nextPosition))
 					blocked = true;
-				else if(!killed && !originalPath.wouldBeKilled(nextPosition.getChecker()))
+				else if(toKill == null  && !originalPath.wouldBeKilled(nextPosition.getChecker()))
 					toKill = nextPosition.getChecker();
 				else
-					break;
+					blocked = true;
 			}
 				
 		}
 		while(nextPosition != null && !blocked);
-	}
-	
-	private void examinePath(Path originalPath, int xDir, int yDir) {
-		
-		if(madeDefensiveMove(originalPath))
-			return;
-		
-		Position lastPosition = originalPath.getLastPosition();
-		Position nextPosition = getNextPosition(lastPosition, xDir, yDir);
-		
-		if(nextPosition != null) {
-
-			if(canMoveDefensive(originalPath, nextPosition))
-				addNewPathBranch(originalPath, nextPosition, null);
-			
-			Position afterNextPosition = getNextPosition(nextPosition, xDir, yDir);
-
-			if(afterNextPosition != null) {
-
-				if (canMoveOffensive(originalPath, nextPosition, afterNextPosition))
-					addNewPathBranch(originalPath, afterNextPosition, nextPosition.getChecker());
-			}
-		}
-
-		nextPosition = getNextPosition(lastPosition, xDir, yDir * (-1));
-		if(nextPosition != null) {
-			
-			Position afterNextPosition = getNextPosition(nextPosition, xDir, yDir * (-1));
-
-			if(afterNextPosition != null) {
-
-				if (canMoveOffensive(originalPath, nextPosition, afterNextPosition))
-					addNewPathBranch(originalPath, afterNextPosition, nextPosition.getChecker());
-			}
-		}
 	}
 
 	private boolean madeDefensiveMove(Path originalPath) {
@@ -240,22 +162,9 @@ public class MovementValidator {
 		return originalPath.getLength() > 1 && originalPath.getStrength() == 0;
 	}
 
-	private boolean canMoveDefensive(Path originalPath, Position nextPosition){
+	private boolean isSameColor(Position nextPosition) {
 		
-		return originalPath.getStrength() == 0 && 
-				(nextPosition.getChecker() == null || 
-				originalPath.wouldBeKilled(nextPosition.getChecker()));
-	}
-
-	private boolean canMoveOffensive(Path originalPath, Position nextPosition, Position afterNextPosition) {
-		
-		Checker toKill = nextPosition.getChecker();
-		
-		return toKill != null && 
-				toKill.COLOR != playerColor && 
-				!originalPath.wouldBeKilled(toKill) &&
-				(!afterNextPosition.hasChecker() || 
-						originalPath.wouldBeKilled(afterNextPosition.getChecker()));
+		return nextPosition.getChecker().COLOR == playerColor;
 	}
 
 	private void addNewPathBranch(Path originalPath, Position nextPosition, Checker checker) {
@@ -282,18 +191,34 @@ public class MovementValidator {
 	}
 	
 	public static void main(String[] args) {
+		
 		Board board = new Board();
-		Player player = new Player("Tomek");
-		player.initialize(Color.WHITE, null);
-		board.getChecker(1, 7).moveTo(board.getPosition(1, 3));
-		board.getChecker(0, 8).moveTo(board.getPosition(3, 5));
-		board.getChecker(5, 7).moveTo(board.getPosition(5, 5));
-		board.getChecker(2, 8).moveTo(board.getPosition(5, 7));
-		board.getChecker(4, 8).moveTo(board.getPosition(9, 5));
-		board.getChecker(2, 2).promote();
+		
+		Player white = new Player("White");
+		white.initialize(Color.WHITE, null);
+		
+		Player black = new Player("Black");
+		black.initialize(Color.BLACK, null);
+		
+		for(int i = 0; i < 50; i++) {
+			
+			Checker checker = board.getRandomChecker();
+			Position position = board.getRandomEmptyPosition();
+			checker.moveTo(position);
+			if(i % 10 == 0)
+				checker.promote();
+		}
+		
 		System.out.println(board);
+		
+		System.out.println("\nWhite possibilities:");
 		MovementValidator validator = new MovementValidator(board);
-		validator.canIStartWith(player, 0, 0);
+		validator.canIStartWith(white, 0, 0);
+		validator.possibilities.forEach(System.out::println);
+
+		System.out.println("\nBlack possibilities:");
+		validator.clean();
+		validator.canIStartWith(black, 0, 0);
 		validator.possibilities.forEach(System.out::println);
 	}
 }

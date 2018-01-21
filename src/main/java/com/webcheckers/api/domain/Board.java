@@ -2,14 +2,18 @@ package com.webcheckers.api.domain;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class Board {
 
 	private Position[][] board;
 	private final int WIDTH = 10;
 	private final int HEIGHT = 10;
+	private List<Checker> allCheckers;
+	private Random generator;
 	
 	public Board() {
+		generator = new Random();
 		board = new Position[WIDTH][HEIGHT];
 		initializeBoard();
 	}
@@ -85,6 +89,26 @@ public class Board {
 			}
 		}
 		return colorCheckers;
+	}
+	
+	public Checker getRandomChecker() {
+		
+		if(allCheckers == null) {
+			allCheckers = getAllPlayerCheckers(Color.BLACK);
+			allCheckers.addAll(getAllPlayerCheckers(Color.WHITE));
+		}
+		return allCheckers.get(generator.nextInt(allCheckers.size()));
+	}
+	
+	public Position getRandomEmptyPosition() {
+		
+		Position position;
+		do {
+			position = board[generator.nextInt(WIDTH)][generator.nextInt(HEIGHT)];
+		}
+		while((position.X + position.Y) % 2 != 0 || position.hasChecker());
+		
+		return position;
 	}
 	
 	@Override

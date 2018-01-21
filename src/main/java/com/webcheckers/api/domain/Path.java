@@ -12,6 +12,7 @@ public class Path {
 	private boolean longest;
 	private boolean promoted;
 	private boolean toDelete;
+	private Color playerColor;
 	
 	public Path() {
 		
@@ -25,6 +26,7 @@ public class Path {
 		this();
 		path.add(starter);
 		promoted = starter.getChecker().isPromoted();
+		playerColor = starter.getChecker().COLOR;
 	}
 
 	public List<Position> getPath() {
@@ -49,16 +51,6 @@ public class Path {
 	
 	public boolean wouldBeKilled(Checker checker) {
 		return killed.contains(checker);
-	}
-	
-	@Override
-	public Path clone() {
-		Path clonedPath = new Path();
-		clonedPath.path.addAll(this.path);
-		clonedPath.killed.addAll(this.killed);
-		clonedPath.promoted = this.promoted;
-		
-		return clonedPath;
 	}
 	
 	public void promote() {
@@ -91,6 +83,21 @@ public class Path {
 		return lastPosition;
 	}
 	
+	public boolean isEmpty(Position position) {
+		
+		return !position.hasChecker() || wouldBeKilled(position.getChecker());
+	}
+	
+	public boolean canMoveDeffensively(int yDir) {
+		
+		return getStrength() == 0 && (isProperDirection(yDir) || promoted);
+	}
+	
+	private boolean isProperDirection(int yDir) {
+		
+		return (yDir == 1 && playerColor == Color.WHITE) || (yDir == -1 && playerColor == Color.BLACK);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
@@ -104,9 +111,17 @@ public class Path {
 	}
 	
 	@Override
+	public Path clone() {
+		Path clonedPath = new Path();
+		clonedPath.path.addAll(this.path);
+		clonedPath.killed.addAll(this.killed);
+		clonedPath.promoted = this.promoted;
+		
+		return clonedPath;
+	}
+	
+	@Override
 	public boolean equals(Object other) {
-		
-		
 		
 		Path otherPath = (Path)other;
 		

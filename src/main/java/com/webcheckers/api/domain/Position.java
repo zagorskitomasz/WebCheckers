@@ -33,10 +33,18 @@ public class Position {
 		
 		if(checker == null)
 			return "_";
-		else if (checker.COLOR == Color.BLACK)
-			return "B";
-		else if (checker.COLOR == Color.WHITE)
-			return "W";
+		else if (checker.COLOR == Color.BLACK) {
+			if(checker.isPromoted())
+				return "B";
+			else
+				return "b";
+		}
+		else if (checker.COLOR == Color.WHITE) {
+			if(checker.isPromoted())
+				return "W";
+			else
+				return "w";
+		}
 		else
 			return " ";
 	}
