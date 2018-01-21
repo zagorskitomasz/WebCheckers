@@ -104,8 +104,12 @@ public class MovementValidator {
 			newPossibilities = new LinkedList<>();
 		
 		for(Path possibility : possibilities) {
-			examineLeft(possibility);
-			examineRight(possibility);
+			if(possibility.isPromoted())
+				examinePromotedPath(possibility);
+			else {
+				examineLeft(possibility);
+				examineRight(possibility);
+			}
 		}
 	}
 
@@ -126,17 +130,74 @@ public class MovementValidator {
 	}
 	
 	private void examinePath(Path originalPath, int direction) {
-		if(originalPath.isPromoted())
-			examinePromotedPath(originalPath, direction);
-		else if(playerColor == Color.WHITE)
+		
+		if(playerColor == Color.WHITE)
 			examinePath(originalPath, direction, 1);
 		else
 			examinePath(originalPath, direction, -1);
 	}
 	
-	private void examinePromotedPath(Path originalPath, int xDir) {
+	private void examinePromotedPath(Path originalPath) {
+		
+		if(madeDefensiveMove(originalPath))
+			return;
+		
+		examinePromotedNW(originalPath);
+		examinePromotedNE(originalPath);
+		examinePromotedSW(originalPath);
+		examinePromotedSE(originalPath);
+	}
+	
+	private void examinePromotedNW(Path originalPath) {
+		examinePromoted(originalPath, -1, -1);
+	}
+	
+	private void examinePromotedNE(Path originalPath) {
+		examinePromoted(originalPath, 1, -1);
+	}
+	
+	private void examinePromotedSW(Path originalPath) {
+		examinePromoted(originalPath, -1, 1);
+	}
+	
+	private void examinePromotedSE(Path originalPath) {
+		examinePromoted(originalPath, 1, 1);
+	}
+	
+	private void examinePromoted(Path originalPath, int xDir, int yDir) {
+		
 		Position lastPosition = originalPath.getLastPosition();
-		//TODO
+		Position nextPosition = lastPosition;
+		boolean killed = false;
+		Checker toKill = null;
+		boolean blocked = false;
+		
+		do {
+			nextPosition = getNextPosition(nextPosition, xDir, yDir);
+			
+			if(nextPosition == null)
+				break;
+			
+			if(!nextPosition.hasChecker() || originalPath.wouldBeKilled(nextPosition.getChecker())) {
+				if(toKill != null) {
+					addNewPathBranch(originalPath, nextPosition, toKill);
+					killed = true;
+				}
+				else if(originalPath.getStrength() == 0)
+					addNewPathBranch(originalPath, nextPosition, null);
+			}
+			
+			if(nextPosition.hasChecker()) {
+				if(nextPosition.getChecker().COLOR == playerColor)
+					blocked = true;
+				else if(!killed && !originalPath.wouldBeKilled(nextPosition.getChecker()))
+					toKill = nextPosition.getChecker();
+				else
+					break;
+			}
+				
+		}
+		while(nextPosition != null && !blocked);
 	}
 	
 	private void examinePath(Path originalPath, int xDir, int yDir) {
@@ -228,9 +289,11 @@ public class MovementValidator {
 		board.getChecker(0, 8).moveTo(board.getPosition(3, 5));
 		board.getChecker(5, 7).moveTo(board.getPosition(5, 5));
 		board.getChecker(2, 8).moveTo(board.getPosition(5, 7));
+		board.getChecker(4, 8).moveTo(board.getPosition(9, 5));
+		board.getChecker(2, 2).promote();
+		System.out.println(board);
 		MovementValidator validator = new MovementValidator(board);
 		validator.canIStartWith(player, 0, 0);
-		System.out.println(board);
 		validator.possibilities.forEach(System.out::println);
 	}
 }

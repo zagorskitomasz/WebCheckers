@@ -1,6 +1,7 @@
 package com.webcheckers.api.domain;
 
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +56,7 @@ public class Path {
 		Path clonedPath = new Path();
 		clonedPath.path.addAll(this.path);
 		clonedPath.killed.addAll(this.killed);
+		clonedPath.promoted = this.promoted;
 		
 		return clonedPath;
 	}
@@ -99,5 +101,28 @@ public class Path {
 		stringBuilder.append("killed: " + getStrength());
 		
 		return stringBuilder.toString();
+	}
+	
+	@Override
+	public boolean equals(Object other) {
+		
+		
+		
+		Path otherPath = (Path)other;
+		
+		if(getLength() == 6 && otherPath.getLength() == 6)
+			this.getClass();
+		
+		if(getLength() != otherPath.getLength() || getStrength() != otherPath.getStrength())
+			return false;
+		
+		Iterator<Position> thisIterator = path.iterator();
+		Iterator<Position> otherIterator = otherPath.path.iterator();
+		
+		while(thisIterator.hasNext() && otherIterator.hasNext())
+			if(!thisIterator.next().equals(otherIterator.next()))
+				return false;
+		
+		return true;
 	}
 }
