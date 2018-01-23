@@ -23,16 +23,19 @@ public class MovementValidator {
 
 	public boolean canIStartWith(Player player, int x, int y) {
 
-		playerColor = player.getColor();
+		if(playerColor != player.getColor()) {
+			clean();
+			playerColor = player.getColor();
+		}
 		position = board.getPosition(x, y);
 
 		if (!isPlayersChecker())
-			;//return false;
+			return false;
 
 		if (possibilities == null)
 			createPossibilities();
 		
-		return false;
+		return isAnyPathStartWith(x, y);
 	}
 
 	private boolean isPlayersChecker() {
@@ -189,6 +192,15 @@ public class MovementValidator {
 		
 		return board.getPosition(nextX, nextY);
 	}
+
+	private boolean isAnyPathStartWith(int x, int y) {
+		
+		for(Path path : possibilities) {
+			if(path.startsFrom(x, y))
+				return true;
+		}
+		return false;
+	}
 	
 	public static void main(String[] args) {
 		
@@ -210,15 +222,22 @@ public class MovementValidator {
 		}
 		
 		System.out.println(board);
-		
-		System.out.println("\nWhite possibilities:");
 		MovementValidator validator = new MovementValidator(board);
-		validator.canIStartWith(white, 0, 0);
-		validator.possibilities.forEach(System.out::println);
-
-		System.out.println("\nBlack possibilities:");
-		validator.clean();
-		validator.canIStartWith(black, 0, 0);
-		validator.possibilities.forEach(System.out::println);
+		
+		int x = 0;
+		int y = 0;
+		System.out.println("Black start with " + x + ", " + y + ": " + validator.canIStartWith(black, x, y));
+		
+		if(validator.possibilities != null) {
+			System.out.println("\nBlack possibilities:");
+			validator.possibilities.forEach(System.out::println);
+		}
+		
+		System.out.println("\nWhite start with " + x + ", " + y + ": " + validator.canIStartWith(white, x, y));
+		
+		if(validator.possibilities != null) {
+			System.out.println("\nWhite possibilities:");
+			validator.possibilities.forEach(System.out::println);
+		}
 	}
 }

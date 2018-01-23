@@ -97,6 +97,13 @@ public class Path {
 		
 		return (yDir == 1 && playerColor == Color.WHITE) || (yDir == -1 && playerColor == Color.BLACK);
 	}
+
+	public boolean startsFrom(int x, int y) {
+		
+		Position firstPosition = path.get(0);
+		
+		return firstPosition != null && firstPosition.X == x && firstPosition.Y == y;
+	}
 	
 	@Override
 	public String toString() {
