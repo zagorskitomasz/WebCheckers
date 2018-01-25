@@ -3,23 +3,23 @@ package com.webcheckers.api.domain;
 public class Checker {
 
 	public final Color COLOR;
-	private Position position;
+	private Field field;
 	private boolean promoted;
 	
-	public Checker(Color color, Position position) {
+	public Checker(Color color, Field field) {
 		this.COLOR = color;
-		this.position = position;
+		this.field = field;
 		promoted = false;
 	}
 	
-	public Position getPosition() {
-		return position;
+	public Field getField() {
+		return field;
 	}
 	
-	public void moveTo(Position position) {
-		this.position.removeChecker();
-		position.insertChecker(this);
-		this.position = position;
+	public void moveTo(Field field) {
+		this.field.removeChecker();
+		field.insertChecker(this);
+		this.field = field;
 	}
 	
 	public void promote() {

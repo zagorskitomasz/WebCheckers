@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Path {
 
-	private List<Position> path;
+	private Deque<Field> path;
 	private List<Checker> killed;
 	private boolean longest;
 	private boolean promoted;
@@ -21,7 +21,7 @@ public class Path {
 		longest = true;
 	}
 	
-	public Path(Position starter) {
+	public Path(Field starter) {
 		
 		this();
 		path.add(starter);
@@ -29,11 +29,11 @@ public class Path {
 		playerColor = starter.getChecker().COLOR;
 	}
 
-	public List<Position> getPath() {
+	public Deque<Field> getPath() {
 		return path;
 	}
 
-	public void addStep(Position step) {
+	public void addStep(Field step) {
 		path.add(step);
 	}
 	
@@ -77,15 +77,13 @@ public class Path {
 		this.toDelete = toDelete;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Position getLastPosition() {
-		Position lastPosition = ((Deque<Position>)path).peekLast();
-		return lastPosition;
+	public Field getLastField() {
+		return path.peekLast();
 	}
 	
-	public boolean isEmpty(Position position) {
+	public boolean isEmpty(Field field) {
 		
-		return !position.hasChecker() || wouldBeKilled(position.getChecker());
+		return !field.hasChecker() || wouldBeKilled(field.getChecker());
 	}
 	
 	public boolean canMoveDeffensively(int yDir) {
@@ -98,19 +96,35 @@ public class Path {
 		return (yDir == 1 && playerColor == Color.WHITE) || (yDir == -1 && playerColor == Color.BLACK);
 	}
 
-	public boolean startsFrom(int x, int y) {
+	public boolean startsFrom(Position position) {
 		
-		Position firstPosition = path.get(0);
+		Field firstField = path.peekFirst();
 		
-		return firstPosition != null && firstPosition.X == x && firstPosition.Y == y;
+		return firstField != null && firstField.POSITION.X == position.X && firstField.POSITION.Y == position.Y;
+	}
+
+	public boolean leadsFromTo(Position from, Position to) {
+		
+		if(!startsFrom(from))
+			return false;
+		
+		Path tempPath = this.clone();
+		tempPath.trimFirst();
+		
+		return tempPath.startsFrom(to);
+	}
+	
+	private void trimFirst() {
+		
+		path.pollFirst();
 	}
 	
 	@Override
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		for(Position position : path)
-			stringBuilder.append(position.X + " " + position.Y + " -> ");
+		for(Field field : path)
+			stringBuilder.append(field.POSITION.X + " " + field.POSITION.Y + " -> ");
 		
 		stringBuilder.append("killed: " + getStrength());
 		
@@ -138,8 +152,8 @@ public class Path {
 		if(getLength() != otherPath.getLength() || getStrength() != otherPath.getStrength())
 			return false;
 		
-		Iterator<Position> thisIterator = path.iterator();
-		Iterator<Position> otherIterator = otherPath.path.iterator();
+		Iterator<Field> thisIterator = path.iterator();
+		Iterator<Field> otherIterator = otherPath.path.iterator();
 		
 		while(thisIterator.hasNext() && otherIterator.hasNext())
 			if(!thisIterator.next().equals(otherIterator.next()))

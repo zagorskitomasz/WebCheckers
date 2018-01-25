@@ -6,15 +6,15 @@ import java.util.Set;
 public class Movement {
 	
 	private Color player;
-	private Position from;
-	private Position to;
+	private Field from;
+	private Field to;
 	private Set<String> killed;
 	
 	public Movement() {
 		killed = new HashSet<>();
 	}
 	
-	public Movement(Color player, Position from, Position to) {
+	public Movement(Color player, Field from, Field to) {
 		this();
 		this.player = player;
 		this.from = from;
@@ -29,19 +29,19 @@ public class Movement {
 		this.player = player;
 	}
 
-	public Position getFrom() {
+	public Field getFrom() {
 		return from;
 	}
 
-	public void setFrom(Position from) {
+	public void setFrom(Field from) {
 		this.from = from;
 	}
 
-	public Position getTo() {
+	public Field getTo() {
 		return to;
 	}
 
-	public void setTo(Position to) {
+	public void setTo(Field to) {
 		this.to = to;
 	}
 

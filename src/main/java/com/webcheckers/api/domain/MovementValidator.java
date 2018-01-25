@@ -7,7 +7,6 @@ public class MovementValidator {
 
 	private Board board;
 	private Color playerColor;
-	private Position position;
 	private List<Path> possibilities;
 	private List<Path> newPossibilities;
 
@@ -17,30 +16,41 @@ public class MovementValidator {
 
 	public void clean() {
 		playerColor = null;
-		position = null;
 		possibilities = null;
 	}
+	
+	public List<Path> getPossibilities(){
+		return possibilities;
+	}
 
-	public boolean canIStartWith(Player player, int x, int y) {
+	public boolean canIStartWith(Player player, Position position) {
 
 		if(playerColor != player.getColor()) {
 			clean();
 			playerColor = player.getColor();
 		}
-		position = board.getPosition(x, y);
+		Field field = board.getField(position);
 
-		if (!isPlayersChecker())
+		if (!isPlayersChecker(field))
 			return false;
 
 		if (possibilities == null)
 			createPossibilities();
 		
-		return isAnyPathStartWith(x, y);
+		return isAnyPathStartWith(position);
+	}
+	
+	public boolean canIMoveThere(Player player, Position from, Position to) {
+		
+		if(!canIStartWith(player, from))
+			return false;
+		
+		return isAnyPathFromTo(from, to);
 	}
 
-	private boolean isPlayersChecker() {
+	private boolean isPlayersChecker(Field field) {
 
-		return position.hasChecker() && playerColor == position.getChecker().COLOR;
+		return field.hasChecker() && playerColor == field.getChecker().COLOR;
 	}
 
 	private void createPossibilities() {
@@ -58,7 +68,7 @@ public class MovementValidator {
 
 		List<Checker> starters = board.getAllPlayerCheckers(playerColor);
 		for (Checker checker : starters) {
-			Path path = new Path(checker.getPosition());
+			Path path = new Path(checker.getField());
 			possibilities.add(path);
 		}
 	}
@@ -127,37 +137,37 @@ public class MovementValidator {
 	
 	private void examinePath(Path originalPath, int xDir, int yDir) {
 		
-		Position lastPosition = originalPath.getLastPosition();
-		Position nextPosition = lastPosition;
+		Field lastField = originalPath.getLastField();
+		Field nextField = lastField;
 		Checker toKill = null;
 		boolean blocked = false;
 		boolean promoted = originalPath.isPromoted();
 		
 		do {
-			nextPosition = getNextPosition(nextPosition, xDir, yDir);
+			nextField = getNextPosition(nextField, xDir, yDir);
 			
-			if(nextPosition == null)
+			if(nextField == null)
 				break;
 			
-			if(originalPath.isEmpty(nextPosition)) {
+			if(originalPath.isEmpty(nextField)) {
 				if(toKill != null) 
-					addNewPathBranch(originalPath, nextPosition, toKill);
+					addNewPathBranch(originalPath, nextField, toKill);
 				else if(originalPath.canMoveDeffensively(yDir)) 
-					addNewPathBranch(originalPath, nextPosition, null);
+					addNewPathBranch(originalPath, nextField, null);
 				blocked = !promoted;
 			}
 			
-			if(nextPosition.hasChecker()) {
-				if(isSameColor(nextPosition))
+			if(nextField.hasChecker()) {
+				if(isSameColor(nextField))
 					blocked = true;
-				else if(toKill == null  && !originalPath.wouldBeKilled(nextPosition.getChecker()))
-					toKill = nextPosition.getChecker();
+				else if(toKill == null  && !originalPath.wouldBeKilled(nextField.getChecker()))
+					toKill = nextField.getChecker();
 				else
 					blocked = true;
 			}
 				
 		}
-		while(nextPosition != null && !blocked);
+		while(nextField != null && !blocked);
 	}
 
 	private boolean madeDefensiveMove(Path originalPath) {
@@ -165,16 +175,16 @@ public class MovementValidator {
 		return originalPath.getLength() > 1 && originalPath.getStrength() == 0;
 	}
 
-	private boolean isSameColor(Position nextPosition) {
+	private boolean isSameColor(Field nextField) {
 		
-		return nextPosition.getChecker().COLOR == playerColor;
+		return nextField.getChecker().COLOR == playerColor;
 	}
 
-	private void addNewPathBranch(Path originalPath, Position nextPosition, Checker checker) {
+	private void addNewPathBranch(Path originalPath, Field nextField, Checker checker) {
 		
 		Path nextPath = originalPath.clone();
 		originalPath.setToDelete(true);
-		nextPath.addStep(nextPosition);
+		nextPath.addStep(nextField);
 		
 		if(checker != null)
 			nextPath.addKilled(checker);
@@ -182,62 +192,32 @@ public class MovementValidator {
 		newPossibilities.add(nextPath);
 	}
 	
-	private Position getNextPosition(Position lastPosition, int xDir, int yDir) {
+	private Field getNextPosition(Field lastField, int xDir, int yDir) {
 		
-		int nextX = lastPosition.X + xDir;
-		int nextY = lastPosition.Y + yDir;
+		int nextX = lastField.POSITION.X + xDir;
+		int nextY = lastField.POSITION.Y + yDir;
 		
 		if(nextX < 0 || nextX > 9 || nextY < 0 || nextY > 9)
 			return null;
 		
-		return board.getPosition(nextX, nextY);
+		return board.getField(new Position(nextX, nextY));
 	}
 
-	private boolean isAnyPathStartWith(int x, int y) {
+	private boolean isAnyPathStartWith(Position position) {
 		
 		for(Path path : possibilities) {
-			if(path.startsFrom(x, y))
+			if(path.startsFrom(position))
 				return true;
 		}
 		return false;
 	}
-	
-	public static void main(String[] args) {
+
+	private boolean isAnyPathFromTo(Position from, Position to){
 		
-		Board board = new Board();
-		
-		Player white = new Player("White");
-		white.initialize(Color.WHITE, null);
-		
-		Player black = new Player("Black");
-		black.initialize(Color.BLACK, null);
-		
-		for(int i = 0; i < 50; i++) {
-			
-			Checker checker = board.getRandomChecker();
-			Position position = board.getRandomEmptyPosition();
-			checker.moveTo(position);
-			if(i % 10 == 0)
-				checker.promote();
+		for(Path path : possibilities) {
+			if(path.leadsFromTo(from, to))
+				return true;
 		}
-		
-		System.out.println(board);
-		MovementValidator validator = new MovementValidator(board);
-		
-		int x = 0;
-		int y = 0;
-		System.out.println("Black start with " + x + ", " + y + ": " + validator.canIStartWith(black, x, y));
-		
-		if(validator.possibilities != null) {
-			System.out.println("\nBlack possibilities:");
-			validator.possibilities.forEach(System.out::println);
-		}
-		
-		System.out.println("\nWhite start with " + x + ", " + y + ": " + validator.canIStartWith(white, x, y));
-		
-		if(validator.possibilities != null) {
-			System.out.println("\nWhite possibilities:");
-			validator.possibilities.forEach(System.out::println);
-		}
+		return false;
 	}
 }

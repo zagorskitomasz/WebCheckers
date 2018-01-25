@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Board {
 
-	private Position[][] board;
+	private Field[][] board;
 	private final int WIDTH = 10;
 	private final int HEIGHT = 10;
 	private List<Checker> allCheckers;
@@ -14,20 +14,20 @@ public class Board {
 	
 	public Board() {
 		generator = new Random();
-		board = new Position[WIDTH][HEIGHT];
+		board = new Field[WIDTH][HEIGHT];
 		initializeBoard();
 	}
 	
 	private void initializeBoard() {
-		createPositions();
+		createFields();
 		fillWithCheckers();
 	}
 
-	private void createPositions() {
+	private void createFields() {
 		
 		for(int i = 0; i < WIDTH; i++)
 			for(int j = 0; j < HEIGHT; j++)
-				board[i][j] = new Position(i, j);
+				board[i][j] = new Field(i, j);
 	}
 	
 	private void fillWithCheckers() {
@@ -52,29 +52,29 @@ public class Board {
 		}
 	}
 
-	private void insertBlackChecker(Position position) {
-		insertChecker(position, Color.BLACK);
+	private void insertBlackChecker(Field field) {
+		insertChecker(field, Color.BLACK);
 	}
 
-	private void insertWhiteChecker(Position position) {
-		insertChecker(position, Color.WHITE);
+	private void insertWhiteChecker(Field field) {
+		insertChecker(field, Color.WHITE);
 	}
 	
-	private void insertChecker(Position position, Color color) {
-		Checker checker = new Checker(color, position);
-		position.insertChecker(checker);
+	private void insertChecker(Field field, Color color) {
+		Checker checker = new Checker(color, field);
+		field.insertChecker(checker);
 	}
 	
-	public Position getPosition(int x, int y) {
-		return board[x][y];
+	public Field getField(Position position) {
+		return board[position.X][position.Y];
 	}
 	
-	public boolean hasChecker(int x, int y) {
-		return board[x][y].hasChecker();
+	public boolean hasChecker(Position position) {
+		return board[position.X][position.Y].hasChecker();
 	}
 	
-	public Checker getChecker(int x, int y) {
-		return board[x][y].getChecker();
+	public Checker getChecker(Position position) {
+		return board[position.X][position.Y].getChecker();
 	}
 
 	public List<Checker> getAllPlayerCheckers(Color color) {
@@ -83,9 +83,9 @@ public class Board {
 		
 		for(int i = 0; i < WIDTH; i ++) {
 			for(int j = 0; j < HEIGHT; j++) {
-				Position position = board[i][j];
-				if(position.hasChecker() && position.getChecker().COLOR == color)
-					colorCheckers.add(position.getChecker());
+				Field field = board[i][j];
+				if(field.hasChecker() && field.getChecker().COLOR == color)
+					colorCheckers.add(field.getChecker());
 			}
 		}
 		return colorCheckers;
@@ -100,15 +100,15 @@ public class Board {
 		return allCheckers.get(generator.nextInt(allCheckers.size()));
 	}
 	
-	public Position getRandomEmptyPosition() {
+	public Field getRandomEmptyField() {
 		
-		Position position;
+		Field field;
 		do {
-			position = board[generator.nextInt(WIDTH)][generator.nextInt(HEIGHT)];
+			field = board[generator.nextInt(WIDTH)][generator.nextInt(HEIGHT)];
 		}
-		while((position.X + position.Y) % 2 != 0 || position.hasChecker());
+		while((field.POSITION.X + field.POSITION.Y) % 2 != 0 || field.hasChecker());
 		
-		return position;
+		return field;
 	}
 	
 	@Override
