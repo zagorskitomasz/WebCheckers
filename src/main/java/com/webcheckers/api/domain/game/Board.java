@@ -80,17 +80,26 @@ public class Board {
 		return board[position.X][position.Y].getChecker();
 	}
 
-	public List<Checker> getAllPlayerCheckers(Color color) {
+	public List<Checker> getAllCheckers() {
 		
-		List<Checker> colorCheckers = new LinkedList<>();
+		List<Checker> allCheckers = new LinkedList<>();
 		
 		for(int i = 0; i < WIDTH; i ++) {
 			for(int j = 0; j < HEIGHT; j++) {
 				Field field = board[i][j];
-				if(field.hasChecker() && field.getChecker().COLOR == color)
-					colorCheckers.add(field.getChecker());
+				if(field.hasChecker())
+					allCheckers.add(field.getChecker());
 			}
 		}
+		return allCheckers;
+	}
+
+	public List<Checker> getAllPlayerCheckers(Color color) {
+		
+		List<Checker> colorCheckers = getAllCheckers();
+		
+		colorCheckers.removeIf(checker -> checker.COLOR != color);
+		
 		return colorCheckers;
 	}
 	

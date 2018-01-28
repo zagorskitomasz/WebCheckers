@@ -87,7 +87,7 @@ public class Path {
 	
 	public boolean isEmpty(Field field) {
 		
-		return !field.hasChecker() || wouldBeKilled(field.getChecker());
+		return !field.hasChecker();
 	}
 	
 	public boolean canMoveDeffensively(int yDir) {
