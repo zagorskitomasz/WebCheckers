@@ -1,6 +1,8 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.game;
 
 import org.springframework.web.socket.WebSocketSession;
+
+import com.webcheckers.api.domain.enums.Color;
 
 public class Player {
 

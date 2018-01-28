@@ -1,4 +1,6 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.game;
+
+import com.webcheckers.api.domain.enums.Color;
 
 public class Checker {
 

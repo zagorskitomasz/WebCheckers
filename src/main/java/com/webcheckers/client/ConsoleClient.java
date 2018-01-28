@@ -2,13 +2,13 @@ package com.webcheckers.client;
 
 import java.util.Scanner;
 
-import com.webcheckers.api.domain.Board;
-import com.webcheckers.api.domain.Checker;
-import com.webcheckers.api.domain.Color;
-import com.webcheckers.api.domain.Field;
-import com.webcheckers.api.domain.MovementValidator;
-import com.webcheckers.api.domain.Player;
-import com.webcheckers.api.domain.Position;
+import com.webcheckers.api.domain.enums.Color;
+import com.webcheckers.api.domain.game.Board;
+import com.webcheckers.api.domain.game.Checker;
+import com.webcheckers.api.domain.game.Field;
+import com.webcheckers.api.domain.game.Player;
+import com.webcheckers.api.domain.moves.MovementValidator;
+import com.webcheckers.api.domain.moves.Position;
 
 public class ConsoleClient {
 

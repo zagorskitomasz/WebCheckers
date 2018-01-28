@@ -1,4 +1,4 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.moves;
 
 public class Position {
 

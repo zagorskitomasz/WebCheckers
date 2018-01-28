@@ -1,8 +1,11 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.game;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import com.webcheckers.api.domain.enums.Color;
+import com.webcheckers.api.domain.moves.Position;
 
 public class Board {
 

@@ -1,9 +1,13 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.moves;
 
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.webcheckers.api.domain.enums.Color;
+import com.webcheckers.api.domain.game.Checker;
+import com.webcheckers.api.domain.game.Field;
 
 public class Path {
 

@@ -1,7 +1,10 @@
-package com.webcheckers.api.domain;
+package com.webcheckers.api.domain.moves;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import com.webcheckers.api.domain.enums.Color;
+import com.webcheckers.api.domain.game.Field;
 
 public class Movement {
 	
