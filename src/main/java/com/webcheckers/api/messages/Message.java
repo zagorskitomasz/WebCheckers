@@ -25,12 +25,22 @@ public class Message implements Serializable{
 	public String serialize() {
 		
 		StringBuilder stringBuilder = new StringBuilder();
+		
+		appendCode(stringBuilder);
+		appendArgs(stringBuilder);
+		
+		return stringBuilder.toString().trim();
+	}
+
+	private void appendCode(StringBuilder stringBuilder) {
+		
 		stringBuilder.append(CODE.getCode() + " ");
+	}
+
+	private void appendArgs(StringBuilder stringBuilder) {
 		
 		for(int i = 0; i < ARGS.length ; i++)
 			stringBuilder.append(ARGS[i] + " ");
-		
-		return stringBuilder.toString().trim();
 	}
 	
 	public static Message deserialize(String stringMessage) {
@@ -38,12 +48,8 @@ public class Message implements Serializable{
 		try {
 			String[] splittedStrings = stringMessage.split(" ");
 			
-			MsgCode code = MsgCode.getByCode(splittedStrings[0]);
-			
-			String[] args = new String[splittedStrings.length - 1];
-			
-			for(int i = 1; i < splittedStrings.length; i++)
-				args[i-1] = splittedStrings[i];
+			MsgCode code = readCode(splittedStrings);
+			String[] args = readArgs(splittedStrings);
 			
 			Message message = new Message(code, args);
 			
@@ -52,5 +58,22 @@ public class Message implements Serializable{
 		catch(Exception ex) {
 			throw new InvalidParameterException("Deserialization failed");
 		}
+	}
+
+	private static MsgCode readCode(String[] splittedStrings) {
+		
+		MsgCode code = MsgCode.getByCode(splittedStrings[0]);
+		
+		return code;
+	}
+
+	private static String[] readArgs(String[] splittedStrings) {
+		
+		String[] args = new String[splittedStrings.length - 1];
+		
+		for(int i = 1; i < splittedStrings.length; i++)
+			args[i-1] = splittedStrings[i];
+		
+		return args;
 	}
 }
