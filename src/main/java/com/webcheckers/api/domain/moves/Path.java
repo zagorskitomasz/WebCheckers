@@ -53,6 +53,10 @@ public class Path {
 		killed.add(checker);
 	}
 	
+	public List<Checker> getKilled(){
+		return killed;
+	}
+	
 	public boolean wouldBeKilled(Checker checker) {
 		return killed.contains(checker);
 	}
@@ -105,6 +109,13 @@ public class Path {
 		Field firstField = path.peekFirst();
 		
 		return firstField != null && firstField.POSITION.X == position.X && firstField.POSITION.Y == position.Y;
+	}
+
+	public boolean endsIn(Position position) {
+
+		Field lastField = path.peekLast();
+		
+		return lastField != null && lastField.POSITION.X == position.X && lastField.POSITION.Y == position.Y;
 	}
 
 	public boolean leadsFromTo(Position from, Position to) {

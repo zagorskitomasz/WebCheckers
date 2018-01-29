@@ -1,9 +1,11 @@
 package com.webcheckers.api.domain.moves;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.webcheckers.api.domain.enums.Color;
+import com.webcheckers.api.domain.enums.MoveResult;
+import com.webcheckers.api.domain.game.Checker;
 import com.webcheckers.api.domain.game.Field;
 
 public class Movement {
@@ -11,10 +13,11 @@ public class Movement {
 	private Color player;
 	private Field from;
 	private Field to;
-	private Set<String> killed;
+	private List<Checker> killed;
+	private MoveResult state;
 	
 	public Movement() {
-		killed = new HashSet<>();
+		killed = new LinkedList<>();
 	}
 	
 	public Movement(Color player, Field from, Field to) {
@@ -22,6 +25,7 @@ public class Movement {
 		this.player = player;
 		this.from = from;
 		this.to= to;
+		state = null;
 	}
 
 	public Color getPlayerColor() {
@@ -48,15 +52,45 @@ public class Movement {
 		this.to = to;
 	}
 
-	public Set<String> getKilled() {
+	public List<Checker> getKilled() {
 		return killed;
 	}
 
-	public void setKilled(Set<String> killed) {
+	public void setKilled(List<Checker> killed) {
 		this.killed = killed;
 	}
 	
-	public void addKilled(String killedOne) {
+	public void addKilled(Checker killedOne) {
 		killed.add(killedOne);
+	}
+	
+	public void setState(MoveResult state) {
+		this.state = state;
+	}
+	
+	public MoveResult getState() {
+		return state;
+	}
+
+	public void checkPromote() {
+		
+		if(whitePromote() || blackPromote())
+			promote();
+	}
+	
+	private boolean whitePromote() {
+		
+		return player == Color.WHITE && to.POSITION.Y == 9;
+	}
+	
+	private boolean blackPromote() {
+		
+		return player == Color.BLACK && to.POSITION.Y == 0;
+	}
+	
+	private void promote() {
+		
+		if(from.hasChecker())
+			from.getChecker().promote();
 	}
 }

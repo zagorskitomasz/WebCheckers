@@ -226,4 +226,13 @@ public class MovementValidator {
 		}
 		return false;
 	}
+
+	public Path isMoveCompleted(Movement currentMovement) {
+		
+		for(Path path : possibilities) {
+			if(path.startsFrom(currentMovement.getFrom().POSITION) && path.endsIn(currentMovement.getTo().POSITION))
+				return path;
+		}
+		return null;
+	}
 }

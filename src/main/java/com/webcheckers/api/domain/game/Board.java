@@ -122,6 +122,19 @@ public class Board {
 		
 		return field;
 	}
+
+	public void killCheckers(List<Checker> killed) {
+		
+		for(int i = 0; i < WIDTH; i ++) {
+			for(int j = 0; j < HEIGHT; j++) {
+				
+				Checker checker = getChecker(new Position(i, j));
+				
+				if(killed.contains(checker))
+					checker.getField().removeChecker();
+			}
+		}
+	}
 	
 	@Override
 	public String toString() {

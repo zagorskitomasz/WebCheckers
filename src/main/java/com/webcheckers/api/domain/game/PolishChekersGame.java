@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.enums.MoveResult;
+import com.webcheckers.api.domain.moves.Movement;
 import com.webcheckers.api.domain.moves.MovementValidator;
+import com.webcheckers.api.domain.moves.Path;
 import com.webcheckers.api.domain.moves.Position;
 import com.webcheckers.api.exceptions.GameNotInitializedException;
 
@@ -17,11 +19,12 @@ public class PolishChekersGame implements Game {
 	private Integer winner;
 	private Integer active;
 	
+	private Movement currentMovement;
 	private MovementValidator validator;
 	private Integer[] defensiveCounter;
 	
 	private List<Checker> checkersToUpdate;
-	private List<Checker> checkersToRemove;
+	private List<Position> checkersToRemove;
 	
 	private String message;
 	
@@ -77,7 +80,7 @@ public class PolishChekersGame implements Game {
 		board = new Board();
 		validator = new MovementValidator(board);
 		
-		checkersToRemove = new LinkedList<Checker>();
+		checkersToRemove = new LinkedList<Position>();
 		checkersToUpdate = new LinkedList<Checker>();
 	}
 
@@ -119,11 +122,106 @@ public class PolishChekersGame implements Game {
 		
 		assertInitialized();
 		
-		//TODO
+		if(currentMovement == null || currentMovement.getState() == MoveResult.MOVE_INITIALIZED){
+			if(canStartFromHere(position))
+				return setStartingPoint(position);
+			else if(currentMovement == null)
+				return rejectMove();
+		}
 		
-		return null;
+		if(currentMovement.getState() == MoveResult.MOVE_INITIALIZED || 
+				currentMovement.getState() == MoveResult.MOVE_IN_PROGRESS) {
+			if(canGoThere(position))
+				return setNextStep(position);
+			else
+				return rejectMove();
+		}
+		return rejectMove();
 	}
 	
+	private boolean canStartFromHere(Position position) {
+		
+		return validator.canIStartWith(whoseMove(), position);
+	}
+
+	private MoveResult setStartingPoint(Position position) {
+		
+		clearLists();
+		
+		currentMovement = new Movement(whoseMove().getColor(), board.getField(position), null);
+		currentMovement.setState(MoveResult.MOVE_INITIALIZED);
+		
+		return MoveResult.MOVE_INITIALIZED;
+	}
+
+	private boolean canGoThere(Position position) {
+		
+		return validator.canIMoveThere(whoseMove(), currentMovement.getFrom().POSITION, position);
+	}
+
+	private MoveResult setNextStep(Position position) {
+		
+		currentMovement.setTo(board.getField(position));
+		
+		Path finalPath = validator.isMoveCompleted(currentMovement);
+		
+		if(finalPath != null)
+			return finalizeMovement(finalPath);
+		else
+			return continueMovement();
+	}
+
+	private MoveResult finalizeMovement(Path path) {
+		
+		updateMovement(path);
+		
+		updateBoard();
+		updateLists();
+		
+		return MoveResult.MOVE_COMPLETED;
+	}
+	
+	private void updateMovement(Path path) {
+		
+		currentMovement.setKilled(path.getKilled());
+		currentMovement.checkPromote();
+	}
+	
+	private void updateBoard() {
+		
+		currentMovement.getFrom().getChecker().moveTo(currentMovement.getTo());
+		board.killCheckers(currentMovement.getKilled());
+	}
+	
+	private void updateLists() {
+		
+		updateUpdateList();
+		updateRemoveList();
+	}
+	
+	private void updateUpdateList() {
+		
+		checkersToUpdate.add(currentMovement.getTo().getChecker());
+	}
+
+	private void updateRemoveList() {
+		
+		currentMovement.getKilled().forEach(checker -> checkersToRemove.add(checker.getField().POSITION));
+		checkersToRemove.add(currentMovement.getTo().POSITION);
+	}
+
+	private MoveResult continueMovement() {
+		
+		// TODO Auto-generated method stub
+		
+		return MoveResult.MOVE_IN_PROGRESS;
+	}
+
+	private MoveResult rejectMove() {
+		
+		return MoveResult.MOVE_REJECTED;
+	}
+
 	public List<?> removeFromBoard(){
 		
 		assertInitialized();
@@ -173,5 +271,11 @@ public class PolishChekersGame implements Game {
 				validator == null ||
 				checkersToRemove == null ||
 				checkersToUpdate == null;
+	}
+	
+	private void clearLists() {
+		
+		checkersToRemove.clear();
+		checkersToUpdate.clear();
 	}
 }
