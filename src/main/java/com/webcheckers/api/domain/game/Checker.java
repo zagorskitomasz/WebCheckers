@@ -31,4 +31,15 @@ public class Checker {
 	public boolean isPromoted() {
 		return promoted;
 	}
+	
+	@Override
+	public String toString() {
+		
+		return isPromoted() ? getSymbol().toUpperCase() : getSymbol();
+	}
+	
+	private String getSymbol() {
+		
+		return COLOR == Color.WHITE ? "w" : "b";
+	}
 }

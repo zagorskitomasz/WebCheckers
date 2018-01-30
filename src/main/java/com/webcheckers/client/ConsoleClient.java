@@ -1,79 +1,89 @@
 package com.webcheckers.client;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.webcheckers.api.domain.enums.Color;
-import com.webcheckers.api.domain.game.Board;
+import com.webcheckers.api.domain.enums.MoveResult;
 import com.webcheckers.api.domain.game.Checker;
-import com.webcheckers.api.domain.game.Field;
+import com.webcheckers.api.domain.game.Game;
 import com.webcheckers.api.domain.game.Player;
-import com.webcheckers.api.domain.moves.MovementValidator;
+import com.webcheckers.api.domain.game.PolishChekersGame;
 import com.webcheckers.api.domain.moves.Position;
 
 public class ConsoleClient {
 
 	public static void main(String[] args) {
 		
-		Board board = new Board();
+		Game game = new PolishChekersGame();
 		
-		Player white = new Player("White");
-		white.initialize(Color.WHITE, null);
+		Player playerWhite = new Player("White");
+		Player playerBlack = new Player("Black");
+		playerWhite.initialize(Color.WHITE, null);
+		playerBlack.initialize(Color.BLACK, null);
 		
-		Player black = new Player("Black");
-		black.initialize(Color.BLACK, null);
+		game.create(playerWhite);
+		game.join(playerBlack);
 		
-		for(int i = 0; i < 50; i++) {
-			
-			Checker checker = board.getRandomChecker();
-			Field field = board.getRandomEmptyField();
-			checker.moveTo(field);
-			if(i % 10 == 0)
-				checker.promote();
-		}
+		game.start();
 		
-		System.out.println(board);
-		MovementValidator validator = new MovementValidator(board);
+		String[][] frontBoard = new String[10][10];
 		
-		int x = 0;
-		int y = 0;
-		Position position = new Position(x, y);
-		System.out.println("Black start with " + x + ", " + y + ": " + validator.canIStartWith(black, position));
-		
-		if(validator.getPossibilities() != null) {
-			System.out.println("\nBlack possibilities:");
-			validator.getPossibilities().forEach(System.out::println);
-		}
-		
-		System.out.println("\nWhite start with " + x + ", " + y + ": " + validator.canIStartWith(white, position));
-		
-		if(validator.getPossibilities() != null) {
-			System.out.println("\nWhite possibilities:");
-			validator.getPossibilities().forEach(System.out::println);
-		}
+		addCheckers(frontBoard, game.addToBoard());
 		
 		Scanner scanner = new Scanner(System.in);
 		String input;
 		do {
+			drawBoard(frontBoard);
+			System.out.println(game.whoseMove().getName() + " move:");
 			input = scanner.nextLine();
 			if("0".equals(input))
 				break;
 			
 			String[] inputs = input.split(" ");
 			
-			Player movingPlayer = "b".equals(inputs[0]) ? black : white;
+			int x = Integer.valueOf(inputs[0]);
+			int y = Integer.valueOf(inputs[1]);
 			
-			int xFrom = Integer.valueOf(inputs[1]);
-			int yFrom = Integer.valueOf(inputs[2]);
+			Position position = new Position(x, y);
 			
-			int xTo = Integer.valueOf(inputs[3]);
-			int yTo = Integer.valueOf(inputs[4]);
+			MoveResult result = game.move(position);
+			System.out.println(result);
 			
-			Position from = new Position(xFrom, yFrom);
-			Position to = new Position(xTo, yTo);
-			
-			System.out.println(movingPlayer.getColor() + " from " + from.X + ", " + from.Y + " to " + to.X + ", " + to.Y + ": " + validator.canIMoveThere(movingPlayer, from, to));
-		}
+			addCheckers(frontBoard, game.addToBoard());
+			removeCheckers(frontBoard, game.removeFromBoard());
+			}
 		while(true);
 		scanner.close();
+	}
+
+	private static void removeCheckers(String[][] frontBoard, List<?> removeFromBoard) {
+
+		for(Object object : removeFromBoard) {
+			Position position = (Position)object;
+			frontBoard[position.Y][position.X] = null;
+		}
+	}
+
+	private static void addCheckers(String[][] frontBoard, List<?> addToBoard) {
+		
+		for(Object object : addToBoard) {
+			Checker checker = (Checker)object;
+			frontBoard[checker.getField().POSITION.Y][checker.getField().POSITION.X] = checker.toString();
+		}
+	}
+
+	private static void drawBoard(String[][] frontBoard) {
+		System.out.println();
+		System.out.println("  0 1 2 3 4 5 6 7 8 9");
+		for(int i = 0; i < 10; i ++) {
+			System.out.print(i + " ");
+			for(int j = 0; j < 10; j++) {
+				System.out.print(frontBoard[i][j] == null ? "_" : frontBoard[i][j]);
+				System.out.print(" ");
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 }

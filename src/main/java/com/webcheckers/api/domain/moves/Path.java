@@ -1,5 +1,6 @@
 package com.webcheckers.api.domain.moves;
 
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,12 +18,14 @@ public class Path {
 	private boolean promoted;
 	private boolean toDelete;
 	private Color playerColor;
+	private int killedGiven;
 	
 	public Path() {
 		
 		path = new LinkedList<>();
 		killed = new LinkedList<>();
 		longest = true;
+		killedGiven = 0;
 	}
 	
 	public Path(Field starter) {
@@ -187,6 +190,12 @@ public class Path {
 			return true;
 		}
 		return false;
+	}
+
+	public List<Checker> getKilledOne() {
+		
+		killedGiven++;
+		return Arrays.asList(killed.get(killedGiven-1));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -46,9 +46,9 @@ public class MovementValidator {
 		return isAnyPathStartWith(position);
 	}
 	
-	public boolean canIMoveThere(Player player, Position from, Position to) {
+	public boolean canIMoveThere(Player player, Position from, Position to, boolean continuing) {
 		
-		if(!canIStartWith(player, from))
+		if(!canIStartWith(player, from) && !continuing)
 			return false;
 		
 		return isAnyPathFromTo(from, to);
@@ -247,5 +247,13 @@ public class MovementValidator {
 				toBeKilled = path.getKilled();
 		}
 		return toBeKilled;
+	}
+
+	public List<Checker> getKilledOne(Movement currentMovement) {
+		
+		for(Path path : possibilities) {
+			return path.getKilledOne();
+		}
+		return null;
 	}
 }

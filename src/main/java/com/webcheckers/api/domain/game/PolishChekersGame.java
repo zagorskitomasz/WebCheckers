@@ -156,7 +156,7 @@ public class PolishChekersGame implements Game {
 
 	private boolean canGoThere(Position position) {
 		
-		return validator.canIMoveThere(whoseMove(), currentMovement.getFrom().POSITION, position);
+		return validator.canIMoveThere(whoseMove(), currentMovement.getFrom().POSITION, position, true);
 	}
 
 	private MoveResult setNextStep(Position position) {
@@ -177,6 +177,8 @@ public class PolishChekersGame implements Game {
 		
 		updateBoard();
 		updateLists();
+		
+		active = (active + 1) % 2;
 		
 		return MoveResult.MOVE_COMPLETED;
 	}
@@ -207,13 +209,14 @@ public class PolishChekersGame implements Game {
 	private void updateRemoveList() {
 		
 		currentMovement.getKilled().forEach(checker -> checkersToRemove.add(checker.getField().POSITION));
-		checkersToRemove.add(currentMovement.getTo().POSITION);
+		checkersToRemove.add(currentMovement.getFrom().POSITION);
 	}
 
 	private MoveResult continueMovement() {
-		
-		List<Checker> toBeKilled = validator.updatePossibilities(currentMovement);
-		currentMovement.setKilled(toBeKilled);
+		//TODO here is problem with continuing move: at from is no checker, but from is needed later to validate with path
+		currentMovement.getFrom().getChecker().moveTo(currentMovement.getTo());
+		validator.updatePossibilities(currentMovement);
+		currentMovement.setKilled(validator.getKilledOne(currentMovement));
 		
 		updateLists();
 		
