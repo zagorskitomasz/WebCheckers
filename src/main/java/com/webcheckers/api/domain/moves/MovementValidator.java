@@ -235,4 +235,17 @@ public class MovementValidator {
 		}
 		return null;
 	}
+
+	public List<Checker> updatePossibilities(Movement currentMovement) {
+		
+		List<Checker> toBeKilled = null;
+		
+		for(Path path : possibilities) {
+			if(!path.update(currentMovement))
+				possibilities.remove(path);
+			else
+				toBeKilled = path.getKilled();
+		}
+		return toBeKilled;
+	}
 }

@@ -212,7 +212,10 @@ public class PolishChekersGame implements Game {
 
 	private MoveResult continueMovement() {
 		
-		// TODO Auto-generated method stub
+		List<Checker> toBeKilled = validator.updatePossibilities(currentMovement);
+		currentMovement.setKilled(toBeKilled);
+		
+		updateLists();
 		
 		return MoveResult.MOVE_IN_PROGRESS;
 	}

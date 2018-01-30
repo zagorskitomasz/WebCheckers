@@ -176,4 +176,27 @@ public class Path {
 		
 		return true;
 	}
+
+	public boolean update(Movement movement) {
+		
+		Position from = movement.getFrom().POSITION;
+		Position to = movement.getTo().POSITION;
+		
+		if(startsFrom(from) && secondStepIs(to)) {
+			removeSecondStep();
+			return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean secondStepIs(Position to) {
+		
+		return ((List<Field>)path).get(1).POSITION.equals(to);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void removeSecondStep() {
+		((List<Field>)path).remove(1);
+	}
 }
