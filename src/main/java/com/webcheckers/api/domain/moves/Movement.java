@@ -15,6 +15,7 @@ public class Movement {
 	private Field to;
 	private List<Checker> killed;
 	private MoveResult state;
+	private Checker mover;
 	
 	public Movement() {
 		killed = new LinkedList<>();
@@ -26,6 +27,7 @@ public class Movement {
 		this.from = from;
 		this.to= to;
 		state = null;
+		mover = from.getChecker();
 	}
 
 	public Color getPlayerColor() {
@@ -50,6 +52,10 @@ public class Movement {
 
 	public void setTo(Field to) {
 		this.to = to;
+	}
+	
+	public Checker getMover() {
+		return mover;
 	}
 
 	public List<Checker> getKilled() {
@@ -89,8 +95,6 @@ public class Movement {
 	}
 	
 	private void promote() {
-		
-		if(from.hasChecker())
-			from.getChecker().promote();
+		mover.promote();
 	}
 }

@@ -46,9 +46,9 @@ public class MovementValidator {
 		return isAnyPathStartWith(position);
 	}
 	
-	public boolean canIMoveThere(Player player, Position from, Position to, boolean continuing) {
+	public boolean canIMoveThere(Checker mover, Position from, Position to) {
 		
-		if(!canIStartWith(player, from) && !continuing)
+		if(!isPlayersChecker(mover.getField()))
 			return false;
 		
 		return isAnyPathFromTo(from, to);
