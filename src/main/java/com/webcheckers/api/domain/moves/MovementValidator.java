@@ -2,6 +2,7 @@ package com.webcheckers.api.domain.moves;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.game.Board;
@@ -29,6 +30,18 @@ public class MovementValidator {
 		return possibilities;
 	}
 
+	public boolean hasAnyPossibility(Player player) {
+		
+		if(playerColor != player.getColor()) {
+			clean();
+			playerColor = player.getColor();
+		}
+		if (possibilities == null)
+			createPossibilities();
+		
+		return possibilities.size() > 0;
+	}
+	
 	public boolean canIStartWith(Player player, Position position) {
 
 		if(playerColor != player.getColor()) {
@@ -60,7 +73,7 @@ public class MovementValidator {
 	}
 
 	private void createPossibilities() {
-		possibilities = new LinkedList<>();
+		possibilities = new CopyOnWriteArrayList<>();
 
 		initializePaths();
 		

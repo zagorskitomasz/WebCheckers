@@ -52,7 +52,12 @@ public class ConsoleClient {
 			
 			addCheckers(frontBoard, game.addToBoard());
 			removeCheckers(frontBoard, game.removeFromBoard());
+			
+			if(result == MoveResult.GAME_OVER) {
+				System.out.println(game.getMessage());
+				break;
 			}
+		}
 		while(true);
 		scanner.close();
 	}

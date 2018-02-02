@@ -10,6 +10,7 @@ import com.webcheckers.api.domain.moves.MovementValidator;
 import com.webcheckers.api.domain.moves.Path;
 import com.webcheckers.api.domain.moves.Position;
 import com.webcheckers.api.exceptions.GameNotInitializedException;
+import com.webcheckers.api.exceptions.GameNotOverException;
 
 public class PolishChekersGame implements Game {
 
@@ -22,6 +23,7 @@ public class PolishChekersGame implements Game {
 	private Movement currentMovement;
 	private MovementValidator validator;
 	private Integer[] defensiveCounter;
+	private boolean isGameOver = false;
 	
 	private List<Checker> checkersToUpdate;
 	private List<Position> checkersToRemove;
@@ -114,7 +116,14 @@ public class PolishChekersGame implements Game {
 		
 		assertInitialized();
 		
-		return getPlayer(winner);
+		if(isGameOver) {
+			if(winner >= 0)
+				return getPlayer(winner);
+			else
+				return null;
+		}
+		else
+			throw new GameNotOverException();
 	}
 
 	@Override
@@ -178,9 +187,16 @@ public class PolishChekersGame implements Game {
 		updateBoard();
 		updateLists();
 		
+		updateDefensiveCounter();
+		
 		active = (active + 1) % 2;
 		
-		return MoveResult.MOVE_COMPLETED;
+		checkGameOver();
+		
+		if(isGameOver)
+			return MoveResult.GAME_OVER;
+		else
+			return MoveResult.MOVE_COMPLETED;
 	}
 	
 	private void updateMovement(Path path) {
@@ -289,5 +305,40 @@ public class PolishChekersGame implements Game {
 		
 		checkersToRemove.clear();
 		checkersToUpdate.clear();
+	}
+	
+	private void updateDefensiveCounter() {
+		
+		if(checkersToRemove.size() > 1)
+			resetDefensiveCounter();
+		else
+			defensiveCounter[active]++;
+	}
+	
+	private void checkGameOver() {
+		
+		if(!validator.hasAnyPossibility(players[active])) {
+			
+			oneOfPlayersWon();
+			return;
+		}
+		if(defensiveCounter[0] >= 15 && defensiveCounter[1] >= 15) {
+			
+			draw();
+			return;
+		}
+	}
+
+	private void draw() {
+		winner = -1;
+		isGameOver = true;
+		message = "Draw!";
+	}
+
+	private void oneOfPlayersWon() {
+		
+		winner = (active + 1) % 2;
+		isGameOver = true;
+		message = players[winner].getName() + " won!";
 	}
 }
