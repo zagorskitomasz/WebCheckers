@@ -27,6 +27,7 @@ public class PolishChekersGame implements Game {
 	
 	private List<Checker> checkersToUpdate;
 	private List<Position> checkersToRemove;
+	private Position selectedPosition;
 	
 	private String message;
 	
@@ -42,11 +43,9 @@ public class PolishChekersGame implements Game {
 	public boolean join(Player player) {
 		
 		try {
-			if(players[0].getColor() == player.getColor()) {
-				
-				message = "Players must have different colors!";
+			if(players[0].getColor() == player.getColor() || players[1] != null) 
 				return false;
-			}
+			
 			players[1] = player;
 			return true;
 		}
@@ -159,6 +158,7 @@ public class PolishChekersGame implements Game {
 		
 		currentMovement = new Movement(whoseMove().getColor(), board.getField(position), null);
 		currentMovement.setState(MoveResult.MOVE_INITIALIZED);
+		selectedPosition = currentMovement.getMover().getField().POSITION;
 		
 		return MoveResult.MOVE_INITIALIZED;
 	}
@@ -250,20 +250,31 @@ public class PolishChekersGame implements Game {
 		return MoveResult.MOVE_REJECTED;
 	}
 
+	@Override
 	public List<?> removeFromBoard(){
 		
 		assertInitialized();
 		
 		return checkersToRemove;
 	}
-	 
+
+	@Override
 	public List<?> addToBoard(){
 		
 		assertInitialized();
 		
 		return checkersToUpdate;
 	}
-	
+
+	@Override
+	public Position getSelectedPosition() {
+		
+		assertInitialized();
+		
+		return selectedPosition;
+	}
+
+	@Override
 	public String getMessage() {
 		
 		return message;
@@ -309,10 +320,10 @@ public class PolishChekersGame implements Game {
 	
 	private void updateDefensiveCounter() {
 		
-		if(checkersToRemove.size() > 1)
-			resetDefensiveCounter();
-		else
+		if(checkersToRemove.size() == 1 || board.getChecker(checkersToRemove.get(0)).isPromoted())
 			defensiveCounter[active]++;
+		else
+			resetDefensiveCounter();
 	}
 	
 	private void checkGameOver() {

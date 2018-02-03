@@ -79,6 +79,16 @@ public interface Game {
 	}
 	
 	/**
+	 * After move some item could be selected on game board.
+	 * 
+	 * @return selected item
+	 */
+	default Position getSelectedPosition() {
+		
+		return null;
+	}
+	
+	/**
 	 * Sometimes games have some info for players etc.
 	 * 
 	 * @return Game message or null if nothing interesting happened.

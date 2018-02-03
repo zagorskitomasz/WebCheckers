@@ -1,29 +1,24 @@
 package com.webcheckers.api.service;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+
+import com.webcheckers.api.messages.Message;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 
-	private WebSocketSession session;
-	
 	@Override
-	public void addSession(WebSocketSession session) {
+	public void registerPlayer(WebSocketSession session) {
+		// TODO Auto-generated method stub
 		
-		this.session = session;
 	}
 
 	@Override
-	public void sendMessage() {
-		try {
-			session.sendMessage(new TextMessage("Hello!", true));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void resolveMessage(Message message) {
+		// TODO Auto-generated method stub
+		
 	}
 
+	
 }

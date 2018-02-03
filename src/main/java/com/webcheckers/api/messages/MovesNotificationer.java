@@ -17,6 +17,6 @@ public class MovesNotificationer extends AbstractWebSocketHandler{
 	
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session){
-		messageService.addSession(session);
+		messageService.registerPlayer(session);
 	}
 }
