@@ -352,4 +352,9 @@ public class PolishChekersGame implements Game {
 		isGameOver = true;
 		message = players[winner].getName() + " won!";
 	}
+
+	@Override
+	public Player[] getPlayers() {
+		return players;
+	}
 }

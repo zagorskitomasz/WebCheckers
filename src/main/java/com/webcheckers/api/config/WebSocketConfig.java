@@ -6,7 +6,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import com.webcheckers.api.messages.MovesNotificationer;
+import com.webcheckers.api.messages.MessageHandler;
 import com.webcheckers.api.service.MessageService;
 import com.webcheckers.api.service.MessageServiceImpl;
 
@@ -21,6 +21,6 @@ public class WebSocketConfig implements WebSocketConfigurer{
 	
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(new MovesNotificationer(messageService()), "/table").withSockJS();
+		registry.addHandler(new MessageHandler(messageService()), "/table").withSockJS();
 	}
 }

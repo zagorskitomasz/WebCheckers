@@ -97,4 +97,11 @@ public interface Game {
 		
 		return null;
 	}
+
+	/**
+	 * Returns players involved in game
+	 * 
+	 * @return players
+	 */
+	public Player[] getPlayers();
 }

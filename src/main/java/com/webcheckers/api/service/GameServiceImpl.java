@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.enums.MoveResult;
@@ -15,7 +15,7 @@ import com.webcheckers.api.domain.game.Player;
 import com.webcheckers.api.domain.game.PolishChekersGame;
 import com.webcheckers.api.domain.moves.Position;
 
-@Component
+@Service
 public class GameServiceImpl implements GameService {
 
 	private Map<GameID, Game> games;
@@ -30,6 +30,12 @@ public class GameServiceImpl implements GameService {
 		
 		if(games.containsKey(gameID))
 			return MsgCode.GAME_EXISTS;
+		
+		for(GameID ID : games.keySet()) {
+			
+			if(ID.NAME.equals(gameID.NAME))
+				return MsgCode.GAME_EXISTS;
+		}
 		
 		Game game = new PolishChekersGame();
 		
@@ -95,15 +101,15 @@ public class GameServiceImpl implements GameService {
 			appendChecker(builder, checker);
 		}
 		String longString = builder.toString();
-		return longString.split("$");
+		return longString.split(" ");
 	}
 
 	private void appendChecker(StringBuilder builder, Checker checker) {
 		
 		if(builder.length() > 0)
-			builder.append("$");
+			builder.append(" ");
 		
-		builder.append(checker.getField().POSITION + " " + checker);
+		builder.append(checker.getField().POSITION + "$" + checker);
 	}
 
 	@Override
@@ -128,13 +134,13 @@ public class GameServiceImpl implements GameService {
 			appendPosition(builder, position);
 		}
 		String longString = builder.toString();
-		return longString.split("$");
+		return longString.split(" ");
 	}
 
 	private void appendPosition(StringBuilder builder, Position position) {
 		
 		if(builder.length() > 0)
-			builder.append("$");
+			builder.append(" ");
 		
 		builder.append(position);
 	}
@@ -188,6 +194,18 @@ public class GameServiceImpl implements GameService {
 	public void destroyGame(GameID gameID) {
 		
 		games.remove(gameID);
+	}
+
+	@Override
+	public Player[] getPlayers(GameID gameID) {
+		
+		try {
+			Game game = games.get(gameID);
+			return game.getPlayers();
+		}
+		catch(Exception ex) {
+			return null;
+		}
 	}
 
 }

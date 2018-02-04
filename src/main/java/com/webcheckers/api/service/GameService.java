@@ -24,4 +24,6 @@ public interface GameService {
 	public MsgCode whoWon(GameID gameID);
 	
 	public void destroyGame(GameID gameID);
+
+	public Player[] getPlayers(GameID gameID);
 }
