@@ -23,6 +23,15 @@ public class GameServiceImpl implements GameService {
 	public GameServiceImpl() {
 		
 		games = new ConcurrentHashMap<>();
+		runDestroyer();
+	}
+	
+	private void runDestroyer() {
+		
+		Runnable destroyer = new GameDestroyer(games);
+		
+		Thread destroyerThread = new Thread(destroyer);
+		destroyerThread.start();
 	}
 	
 	@Override

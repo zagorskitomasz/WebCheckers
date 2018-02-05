@@ -28,7 +28,8 @@ public enum MsgCode {
 	BLACK_WON("25"),
 	WHITE_WON("26"),
 	
-	ERROR("30");
+	ERROR("30"),
+	TIME_OUT("31");
 	
 	private String code;
 	

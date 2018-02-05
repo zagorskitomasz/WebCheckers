@@ -1,7 +1,6 @@
 package com.webcheckers.api.service;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class MessageServiceImpl implements MessageService {
 			resolveMessage(session, message);
 		}
 		catch(Exception ex) {
-			Logger.getGlobal().warning(longMessage);
+			System.out.println("Deserializing failed: " + longMessage);
 			ex.printStackTrace();
 		}
 	}
@@ -66,7 +65,8 @@ public class MessageServiceImpl implements MessageService {
 		notifyBoth(gameID, response);
 	}
 	
-	private void notifyBoth(GameID gameID, Message response) throws IOException {
+	@Override
+	public void notifyBoth(GameID gameID, Message response){
 		
 		Player[] players = gameService.getPlayers(gameID);
 		
@@ -79,7 +79,13 @@ public class MessageServiceImpl implements MessageService {
 			if(player != null && player.getWsSession() != null) {
 				
 				WebSocketSession session = player.getWsSession();
-				session.sendMessage(textMessage);
+				try {
+					session.sendMessage(textMessage);
+				} 
+				catch (IOException ex) {
+					System.out.println("Sending message failed: " + textMessage.getPayload());
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
