@@ -12,10 +12,9 @@ import com.webcheckers.api.messages.Message;
 @Component
 public class GameDestroyer implements Runnable {
 
-	public static final long RUN_INTERVAL = 60000;
+	public static final long RUN_INTERVAL = 6000;
 	public static final long TIME_OUT_VALUE = 600000;
 	
-	private long lastRun;
 	private Map<GameID, Game> games;
 	
 	@Autowired
@@ -24,16 +23,12 @@ public class GameDestroyer implements Runnable {
 	public GameDestroyer(Map<GameID, Game> games){
 		
 		this.games = games;
-		lastRun = System.currentTimeMillis() - RUN_INTERVAL;
 	}
 	
 	@Override
 	public void run() {
-		while(true) {
-			
-			if(System.currentTimeMillis() > lastRun + RUN_INTERVAL)
-				seekAndDestroy();
-		}
+		
+		seekAndDestroy();
 	}
 
 	private void seekAndDestroy() {
@@ -52,5 +47,4 @@ public class GameDestroyer implements Runnable {
 		Message message = new Message(MsgCode.TIME_OUT, gameID, (String[])null);
 		messageService.notifyBoth(gameID, message);
 	}
-
 }

@@ -3,6 +3,9 @@ package com.webcheckers.api.service;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 
@@ -30,8 +33,8 @@ public class GameServiceImpl implements GameService {
 		
 		Runnable destroyer = new GameDestroyer(games);
 		
-		Thread destroyerThread = new Thread(destroyer);
-		destroyerThread.start();
+		ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+	    executorService.scheduleAtFixedRate(destroyer, 0, GameDestroyer.RUN_INTERVAL, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override

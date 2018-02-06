@@ -73,19 +73,24 @@ public class MessageServiceImpl implements MessageService {
 		if(players == null)
 			return;
 		
-		TextMessage textMessage = new TextMessage(response.serialize());
-		
 		for(Player player : players) {
-			if(player != null && player.getWsSession() != null) {
-				
-				WebSocketSession session = player.getWsSession();
-				try {
-					session.sendMessage(textMessage);
-				} 
-				catch (IOException ex) {
-					System.out.println("Sending message failed: " + textMessage.getPayload());
-					ex.printStackTrace();
-				}
+			notifyPlayer(player, response);
+		}
+	}
+
+	private void notifyPlayer(Player player, Message response) {
+		
+		if(player != null && player.getWsSession() != null) {
+
+			TextMessage textMessage = new TextMessage(response.serialize());
+			WebSocketSession session = player.getWsSession();
+			
+			try {
+				session.sendMessage(textMessage);
+			} 
+			catch (IOException ex) {
+				System.out.println("Sending message failed: " + textMessage.getPayload());
+				ex.printStackTrace();
 			}
 		}
 	}
