@@ -7,5 +7,5 @@ import com.webcheckers.api.messages.Message;
 public interface MessageService {
 
 	public void resolveMessage(WebSocketSession session, String longMessage);
-	public void notifyBoth(GameID gameID, Message response);
+	public void notifyBoth(Message response);
 }

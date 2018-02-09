@@ -63,7 +63,7 @@ public class GameServiceImpl implements GameService {
 		
 		Game game = games.get(gameID);
 		
-		if(game == null)
+		if(game == null || samePlayer(gameID, player))
 			return MsgCode.ERROR;
 		
 		if(!game.join(player))
@@ -76,6 +76,14 @@ public class GameServiceImpl implements GameService {
 		catch(Exception ex) {
 			return MsgCode.ERROR;
 		}
+	}
+	
+	private boolean samePlayer(GameID gameID, Player player) {
+		
+		Game game = games.get(gameID);
+		Player oldPlayer = game.getPlayers()[0];
+		
+		return oldPlayer != null && oldPlayer.getWsSession().equals(player.getWsSession());
 	}
 
 	@Override

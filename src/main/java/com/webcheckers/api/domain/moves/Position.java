@@ -23,4 +23,14 @@ public class Position {
 	public String toString() {
 		return X + "$" + Y;
 	}
+
+	public static Position parse(String positionString) {
+		String[] coords = positionString.split("$");
+		
+		int x = Integer.parseInt(coords[0]);
+		int y = Integer.parseInt(coords[1]);
+		
+		Position position = new Position(x, y);
+		return position;
+	}
 }

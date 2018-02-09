@@ -24,9 +24,8 @@ public enum MsgCode {
 	YOU_WON("21"),
 	YOU_LOST("22"),
 	DRAW("23"),
-	DESTROY_GAME("24"),
-	BLACK_WON("25"),
-	WHITE_WON("26"),
+	BLACK_WON("24"),
+	WHITE_WON("25"),
 	
 	ERROR("30"),
 	TIME_OUT("31");
