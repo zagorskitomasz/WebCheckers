@@ -17,6 +17,8 @@ public interface GameService {
 	
 	public String[] getCheckersToRemove(GameID gameID);
 	
+	public String[] getCheckersToRemoveLater(GameID gameID);
+	
 	public String getSelectedPosition(GameID gameID);
 	
 	public MoveResult move(GameID gameID, Position position);

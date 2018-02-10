@@ -147,6 +147,21 @@ public class GameServiceImpl implements GameService {
 		}
 	}
 
+	@Override	
+	public String[] getCheckersToRemoveLater(GameID gameID) {
+		
+		Game game = games.get(gameID);
+		try {
+			@SuppressWarnings("unchecked")
+			List<Position> positions = (List<Position>)game.removeFromBoardLater();
+			
+			return encryptPositions(positions);
+		}
+		catch(Exception ex) {
+			return new String[0];
+		}
+	}
+
 	private String[] encryptPositions(List<Position> positions) {
 		StringBuilder builder = new StringBuilder();
 		

@@ -79,6 +79,16 @@ public interface Game {
 	}
 	
 	/**
+	 * After move some items could be selected to be removed after further event.
+	 * 
+	 * @return list of items to be removed later
+	 */
+	default public List<?> removeFromBoardLater(){
+		
+		return null;
+	}
+	
+	/**
 	 * After move some item could be selected on game board.
 	 * 
 	 * @return selected item

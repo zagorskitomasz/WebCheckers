@@ -27,6 +27,7 @@ public class PolishChekersGame implements Game {
 	
 	private List<Checker> checkersToUpdate;
 	private List<Position> checkersToRemove;
+	private List<Position> checkersToRemoveLater;
 	private Position selectedPosition;
 	
 	private String message;
@@ -82,6 +83,7 @@ public class PolishChekersGame implements Game {
 		validator = new MovementValidator(board);
 		
 		checkersToRemove = new LinkedList<Position>();
+		checkersToRemoveLater = new LinkedList<Position>();
 		checkersToUpdate = new LinkedList<Checker>();
 	}
 
@@ -241,6 +243,7 @@ public class PolishChekersGame implements Game {
 		currentMovement.setKilled(validator.getKilledOne(currentMovement));
 		
 		updateLists();
+		splitRemoveList();
 		
 		return MoveResult.MOVE_IN_PROGRESS;
 	}
@@ -264,6 +267,14 @@ public class PolishChekersGame implements Game {
 		assertInitialized();
 		
 		return checkersToUpdate;
+	}
+
+	@Override
+	public List<?> removeFromBoardLater(){
+		
+		assertInitialized();
+		
+		return checkersToRemoveLater;
 	}
 
 	@Override
@@ -315,6 +326,7 @@ public class PolishChekersGame implements Game {
 	private void clearLists() {
 		
 		checkersToRemove.clear();
+		checkersToRemoveLater.clear();
 		checkersToUpdate.clear();
 	}
 	
@@ -324,6 +336,37 @@ public class PolishChekersGame implements Game {
 			defensiveCounter[active]++;
 		else
 			resetDefensiveCounter();
+	}
+	
+	private void splitRemoveList() {
+		
+		String activeColorLetter = extractActiveColorLetter();
+		
+		addEnemyCheckersToLaterList(activeColorLetter);
+		removeEnemyCheckersFromRemoveList(activeColorLetter);
+	}
+
+	private String extractActiveColorLetter() {
+		
+		return players[active].getColor() == Color.BLACK ? "b" : "w";
+	}
+
+	private void addEnemyCheckersToLaterList(String activeColorLetter) {
+		
+		checkersToRemove.forEach(position -> {
+			if(positionHasColorChecker(activeColorLetter, position))
+				checkersToRemoveLater.add(position);
+		});
+	}
+
+	private void removeEnemyCheckersFromRemoveList(String activeColorLetter) {
+		
+		checkersToRemove.removeIf(position -> positionHasColorChecker(activeColorLetter, position));
+	}
+
+	private boolean positionHasColorChecker(String activeColorLetter, Position position) {
+		
+		return board.getChecker(position).toString().toLowerCase().contains(activeColorLetter);
 	}
 	
 	private void checkGameOver() {
