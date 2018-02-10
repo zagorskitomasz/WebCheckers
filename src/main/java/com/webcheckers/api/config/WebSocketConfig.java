@@ -21,6 +21,6 @@ public class WebSocketConfig implements WebSocketConfigurer{
 	
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-		registry.addHandler(new MessageHandler(messageService()), "/table").withSockJS();
+		registry.addHandler(new MessageHandler(messageService()), "/table").setAllowedOrigins("*").withSockJS();
 	}
 }

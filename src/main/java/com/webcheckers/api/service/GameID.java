@@ -37,4 +37,10 @@ public class GameID {
 		}
 		return false;
 	}
+	
+	@Override
+	public int hashCode() {
+		
+		return NAME.hashCode();
+	}
 }

@@ -20,7 +20,7 @@ public class GameDestroyer implements Runnable {
 	@Autowired
 	private MessageService messageService;
 	
-	public GameDestroyer(Map<GameID, Game> games){
+	public void initialize(Map<GameID, Game> games){
 		
 		this.games = games;
 	}

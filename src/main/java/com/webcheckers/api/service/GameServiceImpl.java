@@ -31,7 +31,8 @@ public class GameServiceImpl implements GameService {
 	
 	private void runDestroyer() {
 		
-		Runnable destroyer = new GameDestroyer(games);
+		Runnable destroyer = new GameDestroyer();
+		((GameDestroyer)destroyer).initialize(games);
 		
 		ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 	    executorService.scheduleAtFixedRate(destroyer, 0, GameDestroyer.RUN_INTERVAL, TimeUnit.MILLISECONDS);
@@ -242,5 +243,4 @@ public class GameServiceImpl implements GameService {
 			return null;
 		}
 	}
-
 }

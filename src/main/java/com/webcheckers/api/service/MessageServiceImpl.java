@@ -28,8 +28,7 @@ public class MessageServiceImpl implements MessageService {
 			resolveMessage(session, message);
 		}
 		catch(Exception ex) {
-			System.out.println("Deserializing failed: " + longMessage);
-			ex.printStackTrace();
+			System.out.println("Deserialization failed: " + longMessage);
 		}
 	}
 	
@@ -51,7 +50,7 @@ public class MessageServiceImpl implements MessageService {
 		}
 	}
 	
-	private void createGame(WebSocketSession session, Message message) throws IOException {
+	private synchronized void createGame(WebSocketSession session, Message message) throws IOException {
 		
 		Player player = new Player("White");
 		player.initialize(Color.WHITE, session);
@@ -62,7 +61,7 @@ public class MessageServiceImpl implements MessageService {
 		notifyBoth(response);
 	}
 	
-	private void joinGame(WebSocketSession session, Message message) throws IOException {
+	private synchronized void joinGame(WebSocketSession session, Message message) throws IOException {
 		
 		Player player = new Player("Black");
 		player.initialize(Color.BLACK, session);
@@ -79,11 +78,11 @@ public class MessageServiceImpl implements MessageService {
 		
 	}
 	
-	private void clickedField(WebSocketSession session, Message message) {
+	private synchronized void clickedField(WebSocketSession session, Message message) {
 		
 		GameID gameID = message.gameID;
 		Position position = Position.parse(message.ARGS[0]);
-		
+	
 		MoveResult result = gameService.move(gameID, position);
 		dispatchMoveResult(gameID, result);
 	}
@@ -91,31 +90,72 @@ public class MessageServiceImpl implements MessageService {
 	private void dispatchMoveResult(GameID gameID, MoveResult result) {
 		
 		switch(result) {
-		case GAME_OVER:
-			gameOver(gameID);
-			break;
-		case MOVE_COMPLETED:
-			moveCompleted(gameID);
-			break;
 		case MOVE_INITIALIZED:
 			moveInitialized(gameID);
 			break;
 		case MOVE_IN_PROGRESS:
 			moveInProgress(gameID);
 			break;
+		case MOVE_COMPLETED:
+			moveCompleted(gameID);
+			break;
 		case MOVE_REJECTED:
 			moveRejected(gameID);
+			break;
+		case GAME_OVER:
+			gameOver(gameID);
+			moveCompleted(gameID);
 			break;
 		default:
 			break;
 		}
 	}
 	
+	private void moveInitialized(GameID gameID) {
+		
+		sendPositionToSelect(gameID);
+		sendWhoseMove(gameID);
+	}
+	
+	private void moveInProgress(GameID gameID) {
+
+		sendCheckersToAdd(gameID);
+		sendPositionToSelect(gameID);
+		sendPositionsToRemove(gameID);
+		sendPositionsToRemoveLater(gameID);
+		sendWhoseMove(gameID);
+	}
+	
+	private void moveCompleted(GameID gameID) {
+
+		sendCheckersToAdd(gameID);
+		sendPositionsToRemove(gameID);
+		sendWhoseMove(gameID);
+	}
+	
+	private void moveRejected(GameID gameID) {
+		
+		notifyBothNoArgsCode(gameID, MsgCode.INVALID_MOVE);
+	}
+	
 	private void gameOver(GameID gameID){
 		
-		moveCompleted(gameID);
-		
 		Color winnerColor = whoWon(gameID);
+		
+		if(winnerColor == null)
+			notifyBothNoArgsCode(gameID, MsgCode.DRAW);
+		else
+			gameWonByPlayer(gameID, winnerColor);
+		
+	}
+
+	private Color whoWon(GameID gameID) {
+		MsgCode whoWon = gameService.whoWon(gameID);
+		Color winnerColor = whoWon == MsgCode.DRAW ? null : (whoWon == MsgCode.BLACK_WON ? Color.BLACK : Color.WHITE);
+		return winnerColor;
+	}
+
+	private void gameWonByPlayer(GameID gameID, Color winnerColor) {
 		
 		for(Player player : gameService.getPlayers(gameID)) {
 			if(player.getColor() == winnerColor)
@@ -123,13 +163,6 @@ public class MessageServiceImpl implements MessageService {
 			else
 				notifyOneNoArgsCode(gameID, player, MsgCode.YOU_LOST);
 		}
-		
-	}
-
-	private Color whoWon(GameID gameID) {
-		MsgCode whoWon = gameService.whoWon(gameID);
-		Color winnerColor = whoWon == MsgCode.BLACK_WON ? Color.BLACK : Color.WHITE;
-		return winnerColor;
 	}
 
 	private void notifyBothNoArgsCode(GameID gameID, MsgCode code) {
@@ -148,6 +181,31 @@ public class MessageServiceImpl implements MessageService {
 		
 		String[] checkers = gameService.getCheckersToAdd(gameID);
 		Message message = new Message(MsgCode.CHECKER_ON_FIELD, gameID, checkers);
+		
+		notifyBoth(message);
+	}
+	
+	private void sendPositionsToRemove(GameID gameID) {
+		
+		String[] positions = gameService.getCheckersToRemove(gameID);
+		Message message = new Message(MsgCode.CHECKER_OFF_FIELD, gameID, positions);
+		
+		notifyBoth(message);
+	}
+	
+	private void sendPositionsToRemoveLater(GameID gameID) {
+		
+		String[] positions = gameService.getCheckersToRemoveLater(gameID);
+		Message message = new Message(MsgCode.CHECKER_TO_KILL, gameID, positions);
+		
+		notifyBoth(message);
+	}
+
+	
+	private void sendPositionToSelect(GameID gameID) {
+		
+		String position = gameService.getSelectedPosition(gameID);
+		Message message = new Message(MsgCode.CHECKER_SELECTED, gameID, position);
 		
 		notifyBoth(message);
 	}

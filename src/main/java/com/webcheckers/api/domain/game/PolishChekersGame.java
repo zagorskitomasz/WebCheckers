@@ -188,8 +188,10 @@ public class PolishChekersGame implements Game {
 		
 		updateBoard();
 		updateLists();
+		joinRemoveList();
 		
 		updateDefensiveCounter();
+		currentMovement = null;
 		
 		active = (active + 1) % 2;
 		
@@ -244,6 +246,7 @@ public class PolishChekersGame implements Game {
 		
 		updateLists();
 		splitRemoveList();
+		selectedPosition = currentMovement.getMover().getField().POSITION;
 		
 		return MoveResult.MOVE_IN_PROGRESS;
 	}
@@ -344,6 +347,11 @@ public class PolishChekersGame implements Game {
 		
 		addEnemyCheckersToLaterList(activeColorLetter);
 		removeEnemyCheckersFromRemoveList(activeColorLetter);
+	}
+	
+	private void joinRemoveList() {
+		
+		checkersToRemove.addAll(checkersToRemoveLater);
 	}
 
 	private String extractActiveColorLetter() {
