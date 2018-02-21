@@ -69,13 +69,11 @@ public class MessageServiceImpl implements MessageService {
 		GameID gameID = message.gameID;
 		
 		MsgCode resultCode = gameService.joinGame(gameID, player);
-		notifyBothNoArgsCode(gameID, resultCode);
 		
-		if(resultCode == MsgCode.GAME_STARTED) {
-			sendCheckersToAdd(gameID);
-			sendWhoseMove(gameID);
-		}
-		
+		if(resultCode != MsgCode.GAME_STARTED)
+			notifyOneNoArgsCode(gameID, player, resultCode);
+		else
+			sendInitializationMessages(gameID, resultCode);
 	}
 	
 	private synchronized void clickedField(WebSocketSession session, Message message) {
@@ -85,6 +83,25 @@ public class MessageServiceImpl implements MessageService {
 	
 		MoveResult result = gameService.move(gameID, position);
 		dispatchMoveResult(gameID, result);
+	}
+	
+	private void sendInitializationMessages(GameID gameID, MsgCode resultCode) {
+
+		sendGameStarted(gameID, resultCode);
+		sendCheckersToAdd(gameID);
+		sendWhoseMove(gameID);
+	}
+	
+	private void sendGameStarted(GameID gameID, MsgCode resultCode) {
+		
+		Player[] players = gameService.getPlayers(gameID);
+		
+		for(Player player : players) {
+			
+			String color = player.getColor() == Color.BLACK ? "b" : "w";
+			Message message = new Message(resultCode, gameID, color);
+			notifyPlayer(player, message);
+		}
 	}
 
 	private void dispatchMoveResult(GameID gameID, MoveResult result) {
