@@ -1,5 +1,7 @@
 package com.webcheckers.api.service;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import com.webcheckers.api.domain.enums.MoveResult;
 import com.webcheckers.api.domain.enums.MsgCode;
 import com.webcheckers.api.domain.game.Player;
@@ -21,7 +23,7 @@ public interface GameService {
 	
 	public String getSelectedPosition(GameID gameID);
 	
-	public MoveResult move(GameID gameID, Position position);
+	public MoveResult move(GameID gameID, Position position, WebSocketSession session);
 	
 	public MsgCode whoWon(GameID gameID);
 	

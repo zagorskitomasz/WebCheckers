@@ -47,7 +47,7 @@ public class ConsoleClient {
 			
 			Position position = new Position(x, y);
 			
-			MoveResult result = game.move(position);
+			MoveResult result = game.move(position, null);
 			System.out.println(result);
 			
 			addCheckers(frontBoard, game.addToBoard());

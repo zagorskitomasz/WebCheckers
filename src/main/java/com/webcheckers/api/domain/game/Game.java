@@ -2,6 +2,8 @@ package com.webcheckers.api.domain.game;
 
 import java.util.List;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import com.webcheckers.api.domain.enums.MoveResult;
 import com.webcheckers.api.domain.moves.Position;
 
@@ -56,7 +58,7 @@ public interface Game {
 	 * @param position
 	 * @return
 	 */
-	public MoveResult move(Position position);
+	public MoveResult move(Position position, WebSocketSession session);
 	
 	/**
 	 * After move some items could be removed from game board.

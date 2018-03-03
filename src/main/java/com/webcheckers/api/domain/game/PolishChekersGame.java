@@ -3,6 +3,8 @@ package com.webcheckers.api.domain.game;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.enums.MoveResult;
 import com.webcheckers.api.domain.moves.Movement;
@@ -128,9 +130,12 @@ public class PolishChekersGame implements Game {
 	}
 
 	@Override
-	public MoveResult move(Position position) {
+	public MoveResult move(Position position, WebSocketSession session) {
 		
 		assertInitialized();
+		
+		if(!isProperPlayerMoving(session))
+			return null;
 		
 		if(currentMovement == null || currentMovement.getState() == MoveResult.MOVE_INITIALIZED){
 			if(canStartFromHere(position))
@@ -147,6 +152,12 @@ public class PolishChekersGame implements Game {
 				return rejectMove();
 		}
 		return rejectMove();
+	}
+	
+	private boolean isProperPlayerMoving(WebSocketSession session) {
+		
+		WebSocketSession properPlayersSession = whoseMove().getWsSession();
+		return properPlayersSession.equals(session);
 	}
 	
 	private boolean canStartFromHere(Position position) {
@@ -335,7 +346,7 @@ public class PolishChekersGame implements Game {
 	
 	private void updateDefensiveCounter() {
 		
-		if(checkersToRemove.size() == 1 || board.getChecker(checkersToRemove.get(0)).isPromoted())
+		if(checkersToRemove.size() == 1 && currentMovement.getMover().isPromoted())
 			defensiveCounter[active]++;
 		else
 			resetDefensiveCounter();

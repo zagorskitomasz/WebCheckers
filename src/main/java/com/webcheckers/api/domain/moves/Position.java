@@ -25,7 +25,7 @@ public class Position {
 	}
 
 	public static Position parse(String positionString) {
-		String[] coords = positionString.split("$");
+		String[] coords = positionString.split("\\$");
 		
 		int x = Integer.parseInt(coords[0]);
 		int y = Integer.parseInt(coords[1]);

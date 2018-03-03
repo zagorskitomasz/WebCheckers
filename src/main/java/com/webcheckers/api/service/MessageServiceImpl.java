@@ -81,7 +81,7 @@ public class MessageServiceImpl implements MessageService {
 		GameID gameID = message.gameID;
 		Position position = Position.parse(message.ARGS[0]);
 	
-		MoveResult result = gameService.move(gameID, position);
+		MoveResult result = gameService.move(gameID, position, session);
 		dispatchMoveResult(gameID, result);
 	}
 	
@@ -105,6 +105,9 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	private void dispatchMoveResult(GameID gameID, MoveResult result) {
+		
+		if(result == null)
+			return;
 		
 		switch(result) {
 		case MOVE_INITIALIZED:

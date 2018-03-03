@@ -8,6 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketSession;
 
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.enums.MoveResult;
@@ -194,11 +195,11 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
-	public MoveResult move(GameID gameID, Position position) {
+	public MoveResult move(GameID gameID, Position position, WebSocketSession session) {
 		
 		Game game = games.get(gameID);
 		try {
-			return game.move(position);
+			return game.move(position, session);
 		}
 		catch(Exception ex) {
 			return MoveResult.MOVE_REJECTED;
