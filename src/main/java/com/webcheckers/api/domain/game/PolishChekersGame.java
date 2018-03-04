@@ -354,10 +354,10 @@ public class PolishChekersGame implements Game {
 	
 	private void splitRemoveList() {
 		
-		String activeColorLetter = extractActiveColorLetter();
+		String enemyColorLetter = extractEnemyColorLetter();
 		
-		addEnemyCheckersToLaterList(activeColorLetter);
-		removeEnemyCheckersFromRemoveList(activeColorLetter);
+		addEnemyCheckersToLaterList(enemyColorLetter);
+		removeEnemyCheckersFromRemoveList(enemyColorLetter);
 	}
 	
 	private void joinRemoveList() {
@@ -365,27 +365,27 @@ public class PolishChekersGame implements Game {
 		checkersToRemove.addAll(checkersToRemoveLater);
 	}
 
-	private String extractActiveColorLetter() {
+	private String extractEnemyColorLetter() {
 		
-		return players[active].getColor() == Color.BLACK ? "b" : "w";
+		return players[active].getColor() == Color.BLACK ? "w" : "b";
 	}
 
-	private void addEnemyCheckersToLaterList(String activeColorLetter) {
+	private void addEnemyCheckersToLaterList(String enemyColorLetter) {
 		
 		checkersToRemove.forEach(position -> {
-			if(positionHasColorChecker(activeColorLetter, position))
+			if(positionHasColorChecker(enemyColorLetter, position))
 				checkersToRemoveLater.add(position);
 		});
 	}
 
-	private void removeEnemyCheckersFromRemoveList(String activeColorLetter) {
+	private void removeEnemyCheckersFromRemoveList(String enemyColorLetter) {
 		
-		checkersToRemove.removeIf(position -> positionHasColorChecker(activeColorLetter, position));
+		checkersToRemove.removeIf(position -> positionHasColorChecker(enemyColorLetter, position));
 	}
 
-	private boolean positionHasColorChecker(String activeColorLetter, Position position) {
+	private boolean positionHasColorChecker(String enemyColorLetter, Position position) {
 		
-		return board.getChecker(position).toString().toLowerCase().contains(activeColorLetter);
+		return board.hasChecker(position) && board.getChecker(position).toString().toLowerCase().contains(enemyColorLetter);
 	}
 	
 	private void checkGameOver() {

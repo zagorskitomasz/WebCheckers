@@ -28,6 +28,7 @@ public class MessageServiceImpl implements MessageService {
 			resolveMessage(session, message);
 		}
 		catch(Exception ex) {
+			ex.printStackTrace();
 			System.out.println("Deserialization failed: " + longMessage);
 		}
 	}
@@ -58,7 +59,10 @@ public class MessageServiceImpl implements MessageService {
 		MsgCode resultCode = gameService.createGame(message.gameID, player);
 		Message response = new Message(resultCode, message.gameID, (String[])null);
 		
-		notifyBoth(response);
+		if(resultCode == MsgCode.GAME_EXISTS)
+			notifySessionUser(message.gameID, session, resultCode);
+		else
+			notifyBoth(response);
 	}
 	
 	private synchronized void joinGame(WebSocketSession session, Message message) throws IOException {
@@ -71,9 +75,17 @@ public class MessageServiceImpl implements MessageService {
 		MsgCode resultCode = gameService.joinGame(gameID, player);
 		
 		if(resultCode != MsgCode.GAME_STARTED)
-			notifyOneNoArgsCode(gameID, player, resultCode);
+			notifySessionUser(gameID, session, resultCode);
 		else
 			sendInitializationMessages(gameID, resultCode);
+	}
+	
+	private void notifySessionUser(GameID gameID, WebSocketSession session, MsgCode resultCode) {
+		
+		Player ghostPlayer = new Player(null);
+		ghostPlayer.setWsSession(session);
+		
+		notifyOneNoArgsCode(gameID, ghostPlayer, resultCode);
 	}
 	
 	private synchronized void clickedField(WebSocketSession session, Message message) {
@@ -123,8 +135,8 @@ public class MessageServiceImpl implements MessageService {
 			moveRejected(gameID);
 			break;
 		case GAME_OVER:
-			gameOver(gameID);
 			moveCompleted(gameID);
+			gameOver(gameID);
 			break;
 		default:
 			break;

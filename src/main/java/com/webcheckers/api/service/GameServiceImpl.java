@@ -202,6 +202,7 @@ public class GameServiceImpl implements GameService {
 			return game.move(position, session);
 		}
 		catch(Exception ex) {
+			ex.printStackTrace();
 			return MoveResult.MOVE_REJECTED;
 		}
 	}
