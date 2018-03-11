@@ -21,6 +21,18 @@ public class MessageServiceImpl implements MessageService {
 	private GameService gameService;
 	
 	@Override
+	public void sessionClosed(WebSocketSession session) {
+		
+		Player waiting = gameService.playerDisconnected(session);
+		
+		if(waiting == null)
+			return;
+		
+		Message message = new Message(MsgCode.PLAYER_DISCONNECTED, null, waiting.getColor() == Color.WHITE ? "b" : "w");
+		notifyPlayer(waiting, message);
+	}
+	
+	@Override
 	public void resolveMessage(WebSocketSession session, String longMessage) {
 		
 		try {
@@ -80,7 +92,7 @@ public class MessageServiceImpl implements MessageService {
 			sendInitializationMessages(gameID, resultCode);
 	}
 	
-	private void notifySessionUser(GameID gameID, WebSocketSession session, MsgCode resultCode) {
+	public void notifySessionUser(GameID gameID, WebSocketSession session, MsgCode resultCode) {
 		
 		Player ghostPlayer = new Player(null);
 		ghostPlayer.setWsSession(session);
@@ -101,6 +113,8 @@ public class MessageServiceImpl implements MessageService {
 
 		sendGameStarted(gameID, resultCode);
 		sendCheckersToAdd(gameID);
+		sendPositionsToRemoveLater(gameID);
+		sendPositionToSelect(gameID);
 		sendWhoseMove(gameID);
 	}
 	
@@ -228,6 +242,9 @@ public class MessageServiceImpl implements MessageService {
 	private void sendPositionsToRemoveLater(GameID gameID) {
 		
 		String[] positions = gameService.getCheckersToRemoveLater(gameID);
+		if(positions == null || positions.length == 0 || positions[0].trim().length() == 0)
+			return;
+		
 		Message message = new Message(MsgCode.CHECKER_TO_KILL, gameID, positions);
 		
 		notifyBoth(message);
@@ -237,6 +254,9 @@ public class MessageServiceImpl implements MessageService {
 	private void sendPositionToSelect(GameID gameID) {
 		
 		String position = gameService.getSelectedPosition(gameID);
+		if(position == null || position.trim().length() == 0)
+			return;
+		
 		Message message = new Message(MsgCode.CHECKER_SELECTED, gameID, position);
 		
 		notifyBoth(message);

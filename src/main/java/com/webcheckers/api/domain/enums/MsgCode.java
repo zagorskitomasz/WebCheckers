@@ -11,6 +11,7 @@ public enum MsgCode {
 	GAME_STARTED("05"),
 	GAME_FINISHED("06"),
 	GAME_FULL("07"),
+	GAME_NOT_EXIST("08"),
 	
 	CLICKED_FIELD("11"),
 	CHECKER_SELECTED("12"),
@@ -26,8 +27,12 @@ public enum MsgCode {
 	BLACK_WON("24"),
 	WHITE_WON("25"),
 	
-	ERROR("30"),
-	TIME_OUT("31");
+	TIME_OUT("30"),
+	ERROR("31"),
+	
+	DISCONNECTED("40"),
+	CONNECTED("41"),
+	PLAYER_DISCONNECTED("42");
 	
 	private String code;
 	

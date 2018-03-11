@@ -44,12 +44,20 @@ public class PolishChekersGame implements Game {
 
 	@Override
 	public boolean join(Player player) {
-		
+
 		try {
-			if(players[0].getColor() == player.getColor() || players[1] != null) 
+			Integer freeIndex = getFreePlayerIndex();
+			if(freeIndex == null)
 				return false;
+		
+			Player waitingPlayer = players[(freeIndex + 1) % 2];
 			
-			players[1] = player;
+			if(waitingPlayer != null)
+				updatePlayer(player, waitingPlayer.getColor() == Color.WHITE ? Color.BLACK : Color.WHITE);
+			else
+				updatePlayer(player, Color.WHITE);
+		
+			players[freeIndex] = player;
 			return true;
 		}
 		catch(Exception ex) {
@@ -57,13 +65,36 @@ public class PolishChekersGame implements Game {
 		}
 	}
 
+	private void updatePlayer(Player player, Color color) {
+		
+		player.setColor(color);
+		player.setName(color == Color.BLACK ? "Black" : "White");
+	}
+	
+	private Integer getFreePlayerIndex() {
+		
+		for(int i = 0; i < players.length; i++) {
+			if(players[i] == null)
+				return i;
+		}
+		return null;
+	}
+	
+	@Override
+	public boolean bothPlayersJoined() {
+		
+		return getFreePlayerIndex() == null;
+	}
+
 	@Override
 	public Player start() {
 		
-		if(players == null || players.length != 2)
+		if(players == null || players.length != 2 || players[0] == null || players[1] == null)
 			throw new GameNotInitializedException();
 		
-		initializeGame();
+		if(gameNotInitialized())
+			initializeGame();
+		prepareInitialCheckers();
 		
 		message = "Game initialized. Default checkers are ready.";
 		
@@ -330,6 +361,8 @@ public class PolishChekersGame implements Game {
 		return players == null || 
 				defensiveCounter == null ||
 				players.length != 2 ||
+				players[0] == null ||
+				players[1] == null ||
 				defensiveCounter.length != 2 ||
 				board == null ||
 				validator == null ||
@@ -418,5 +451,24 @@ public class PolishChekersGame implements Game {
 	@Override
 	public Player[] getPlayers() {
 		return players;
+	}
+	
+	@Override
+	public boolean containsSession(WebSocketSession session) {
+		
+		for(Player player : players) {
+			if(player != null && session.equals(player.getWsSession()))
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public void removePlayerBySession(WebSocketSession session) {
+		
+		for(int i = 0; i < players.length; i++) {
+			if(players[i] != null && session.equals(players[i].getWsSession()))
+				players[i] = null;
+		}
 	}
 }

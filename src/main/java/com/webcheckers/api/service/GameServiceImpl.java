@@ -62,16 +62,22 @@ public class GameServiceImpl implements GameService {
 
 	@Override
 	public MsgCode joinGame(GameID gameID, Player player) {
-		
-		Game game = games.get(gameID);
-		
-		if(game == null || samePlayer(gameID, player))
-			return MsgCode.ERROR;
-		
-		if(!game.join(player))
-			return MsgCode.GAME_FULL;
-		
+
 		try {
+			Game game = games.get(gameID);
+		
+			if(game == null)
+				return MsgCode.GAME_NOT_EXIST;
+		
+			if(samePlayer(gameID, player))
+				return MsgCode.ERROR;
+		
+			if(!game.join(player))
+				return MsgCode.GAME_FULL;
+		
+			if(!game.bothPlayersJoined())
+				return MsgCode.GAME_CREATED;
+		
 			game.start();
 			return MsgCode.GAME_STARTED;
 		}
@@ -83,9 +89,8 @@ public class GameServiceImpl implements GameService {
 	private boolean samePlayer(GameID gameID, Player player) {
 		
 		Game game = games.get(gameID);
-		Player oldPlayer = game.getPlayers()[0];
 		
-		return oldPlayer != null && oldPlayer.getWsSession().equals(player.getWsSession());
+		return game.containsSession(player.getWsSession());
 	}
 
 	@Override
@@ -244,5 +249,39 @@ public class GameServiceImpl implements GameService {
 		catch(Exception ex) {
 			return null;
 		}
+	}
+	
+	@Override
+	public Player playerDisconnected(WebSocketSession session) {
+		
+		Game game = getGameBySession(session);
+		
+		if(game == null)
+			return null;
+		
+		Player[] players = updatePlayers(session, game);
+		
+		for(Player player : players) {
+			if(player != null)
+				return player;
+		}
+		return null;
+	}
+	
+	private Game getGameBySession(WebSocketSession session) {
+		
+		for(Game game : games.values()) {
+			if(game.containsSession(session))
+				return game;
+		}
+		return null;
+	}
+
+	private Player[] updatePlayers(WebSocketSession session, Game game) {
+		
+		game.removePlayerBySession(session);
+		Player[] players = game.getPlayers();
+		
+		return players;
 	}
 }

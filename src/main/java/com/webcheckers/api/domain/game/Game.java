@@ -116,4 +116,10 @@ public interface Game {
 	 * @return players
 	 */
 	public Player[] getPlayers();
+	
+	public boolean containsSession(WebSocketSession session);
+	
+	public void removePlayerBySession(WebSocketSession session);
+	
+	public boolean bothPlayersJoined();
 }

@@ -30,4 +30,6 @@ public interface GameService {
 	public void destroyGame(GameID gameID);
 
 	public Player[] getPlayers(GameID gameID);
+	
+	public Player playerDisconnected(WebSocketSession session);
 }
