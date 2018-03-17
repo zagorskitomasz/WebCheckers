@@ -122,4 +122,6 @@ public interface Game {
 	public void removePlayerBySession(WebSocketSession session);
 	
 	public boolean bothPlayersJoined();
+
+	public boolean invert(WebSocketSession session);
 }

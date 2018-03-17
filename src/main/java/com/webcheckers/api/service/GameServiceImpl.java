@@ -284,4 +284,18 @@ public class GameServiceImpl implements GameService {
 		
 		return players;
 	}
+
+	@Override
+	public boolean invert(GameID gameID, WebSocketSession session) {
+		
+		Game game = games.get(gameID);
+		try {
+			return game.invert(session);
+				
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
 }

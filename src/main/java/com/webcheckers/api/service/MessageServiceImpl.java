@@ -37,7 +37,9 @@ public class MessageServiceImpl implements MessageService {
 		
 		try {
 			Message message = Message.deserialize(longMessage);
-			resolveMessage(session, message);
+			
+			if(message != null)
+				resolveMessage(session, message);
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
@@ -56,6 +58,9 @@ public class MessageServiceImpl implements MessageService {
 			break;
 		case CLICKED_FIELD:
 			clickedField(session, message);
+			break;
+		case INVERT:
+			invert(session, message);
 			break;
 		default:
 			break;
@@ -107,6 +112,13 @@ public class MessageServiceImpl implements MessageService {
 	
 		MoveResult result = gameService.move(gameID, position, session);
 		dispatchMoveResult(gameID, result);
+	}
+	
+	private synchronized void invert(WebSocketSession session, Message message) {
+		
+		GameID gameID = message.gameID;
+		if(gameService.invert(gameID, session))
+			notifyBothNoArgsCode(gameID, MsgCode.INVERTED);
 	}
 	
 	private void sendInitializationMessages(GameID gameID, MsgCode resultCode) {

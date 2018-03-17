@@ -32,4 +32,6 @@ public interface GameService {
 	public Player[] getPlayers(GameID gameID);
 	
 	public Player playerDisconnected(WebSocketSession session);
+
+	public boolean invert(GameID gameID, WebSocketSession session);
 }

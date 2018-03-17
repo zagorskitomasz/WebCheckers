@@ -21,6 +21,7 @@ public class PolishChekersGame implements Game {
 	private Player[] players;
 	private Integer winner;
 	private Integer active;
+	private InvertRequest invertRequest;
 	
 	private Movement currentMovement;
 	private MovementValidator validator;
@@ -118,6 +119,8 @@ public class PolishChekersGame implements Game {
 		checkersToRemove = new LinkedList<Position>();
 		checkersToRemoveLater = new LinkedList<Position>();
 		checkersToUpdate = new LinkedList<Checker>();
+		
+		invertRequest = new InvertRequest();
 	}
 
 	private void initializeIntegers() {
@@ -463,12 +466,44 @@ public class PolishChekersGame implements Game {
 		return false;
 	}
 	
-	@Override
-	public void removePlayerBySession(WebSocketSession session) {
+	private Integer getPlayerBySession(WebSocketSession session) {
 		
 		for(int i = 0; i < players.length; i++) {
 			if(players[i] != null && session.equals(players[i].getWsSession()))
-				players[i] = null;
+				return i;
 		}
+		return null;
+	}
+	
+	@Override
+	public void removePlayerBySession(WebSocketSession session) {
+		
+		Integer index = getPlayerBySession(session);
+		if(index != null)
+			players[index] = null;
+	}
+
+	@Override
+	public boolean invert(WebSocketSession session) {
+		
+		Integer index = getPlayerBySession(session);
+		if(index == null)
+			return false;
+		
+		invertRequest.addPlayer(players[index].getColor());
+		
+		if(invertRequest.isCompleted()) {
+			invertGame();
+			return true;
+		}
+		return false;
+	}
+
+	private void invertGame() {
+		
+		for(Player player : players)
+			player.invert();
+		
+		invertRequest.reset();
 	}
 }

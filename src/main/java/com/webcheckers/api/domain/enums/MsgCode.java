@@ -32,7 +32,10 @@ public enum MsgCode {
 	
 	DISCONNECTED("40"),
 	CONNECTED("41"),
-	PLAYER_DISCONNECTED("42");
+	PLAYER_DISCONNECTED("42"), 
+	
+	INVERT("50"), 
+	INVERTED("51");
 	
 	private String code;
 	

@@ -61,6 +61,9 @@ public class Message implements Serializable {
 
 		try {
 			String[] splittedStrings = stringMessage.split(" ");
+			
+			if(splittedStrings.length < 3)
+				return null;
 
 			GameID gameID = readID(splittedStrings);
 			MsgCode code = readCode(splittedStrings);
