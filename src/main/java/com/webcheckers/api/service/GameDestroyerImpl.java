@@ -34,7 +34,7 @@ public class GameDestroyerImpl implements GameDestroyer {
 	private void seekAndDestroy() {
 		
 		for(GameID gameID : games.keySet()) {
-			if(gameID.isTimedOut() || true) {
+			if(gameID.isTimedOut()) {
 				
 				try {
 				notifyAboutDestroying(gameID);
