@@ -107,6 +107,19 @@ public class GameServiceImpl implements GameService {
 	}
 
 	@Override
+	public Player whoIsWaiting(GameID gameID) {
+		
+		Game game = games.get(gameID);
+		
+		try {
+			return game.whoIsWaiting();
+		}
+		catch(Exception ex) {
+			return null;
+		}
+	}
+
+	@Override
 	public String[] getCheckersToAdd(GameID gameID) {
 		
 		Game game = games.get(gameID);

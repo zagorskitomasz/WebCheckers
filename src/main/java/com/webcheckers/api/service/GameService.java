@@ -15,6 +15,8 @@ public interface GameService {
 	
 	public Player whoseMove(GameID gameID);
 	
+	public Player whoIsWaiting(GameID gameID);
+	
 	public String[] getCheckersToAdd(GameID gameID);
 	
 	public String[] getCheckersToRemove(GameID gameID);

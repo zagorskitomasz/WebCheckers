@@ -149,6 +149,14 @@ public class PolishChekersGame implements Game {
 	}
 
 	@Override
+	public Player whoIsWaiting() {
+		
+		assertInitialized();
+		
+		return getPlayer((active + 1) % 2);
+	}
+
+	@Override
 	public Player whoWon() {
 		
 		assertInitialized();
@@ -503,6 +511,14 @@ public class PolishChekersGame implements Game {
 		
 		for(Player player : players)
 			player.invert();
+		
+		active = (active + 1) % 2;
+		
+		int counter0 = defensiveCounter[0];
+		int counter1 = defensiveCounter[1];
+		
+		defensiveCounter[0] = counter1;
+		defensiveCounter[1] = counter0;
 		
 		invertRequest.reset();
 	}

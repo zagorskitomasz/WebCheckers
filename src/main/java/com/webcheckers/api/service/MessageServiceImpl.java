@@ -117,8 +117,10 @@ public class MessageServiceImpl implements MessageService {
 	private synchronized void invert(WebSocketSession session, Message message) {
 		
 		GameID gameID = message.gameID;
-		if(gameService.invert(gameID, session))
+		if(gameService.invert(gameID, session)) {
 			notifyBothNoArgsCode(gameID, MsgCode.INVERTED);
+			sendWhoseMove(gameID);
+		}
 	}
 	
 	private void sendInitializationMessages(GameID gameID, MsgCode resultCode) {
@@ -276,8 +278,11 @@ public class MessageServiceImpl implements MessageService {
 	
 	private void sendWhoseMove(GameID gameID) {
 		
-		Player player = gameService.whoseMove(gameID);
-		notifyOneNoArgsCode(gameID, player, MsgCode.YOUR_MOVE);
+		Player playerActive = gameService.whoseMove(gameID);
+		notifyOneNoArgsCode(gameID, playerActive, MsgCode.YOUR_MOVE);
+		
+		Player playerWaiting = gameService.whoIsWaiting(gameID);
+		notifyOneNoArgsCode(gameID, playerWaiting, MsgCode.DEACTIVATE);
 	}
 	
 	@Override

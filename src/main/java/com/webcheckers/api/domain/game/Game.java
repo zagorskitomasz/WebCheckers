@@ -38,6 +38,8 @@ public interface Game {
 	 */
 	public Player whoseMove();
 	
+	public Player whoIsWaiting();
+	
 	/**
 	 * Starting created game.
 	 * 

@@ -26,6 +26,7 @@ public enum MsgCode {
 	DRAW("23"),
 	BLACK_WON("24"),
 	WHITE_WON("25"),
+	DEACTIVATE("26"),
 	
 	TIME_OUT("30"),
 	ERROR("31"),
