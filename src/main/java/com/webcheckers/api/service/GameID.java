@@ -15,7 +15,7 @@ public class GameID {
 	
 	public boolean isTimedOut() {
 		
-		return System.currentTimeMillis() > lastCheck + GameDestroyer.TIME_OUT_VALUE;
+		return System.currentTimeMillis() > lastCheck + GameDestroyerImpl.TIME_OUT_VALUE;
 	}
 	
 	private void check() {

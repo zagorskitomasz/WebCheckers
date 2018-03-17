@@ -1,5 +1,6 @@
 package com.webcheckers.api.messages;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -12,11 +13,8 @@ import com.webcheckers.api.service.MessageService;
 @Component
 public class MessageHandler extends AbstractWebSocketHandler{
 	
+	@Autowired
 	private MessageService messageService;
-	
-	public MessageHandler(MessageService messageService) {
-		this.messageService = messageService;
-	}
 	
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) {

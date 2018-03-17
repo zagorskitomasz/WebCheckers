@@ -121,6 +121,8 @@ public class MessageServiceImpl implements MessageService {
 			notifyBothNoArgsCode(gameID, MsgCode.INVERTED);
 			sendWhoseMove(gameID);
 		}
+		else
+			notifyBothNoArgsCode(gameID, MsgCode.INVERT_REQUEST);
 	}
 	
 	private void sendInitializationMessages(GameID gameID, MsgCode resultCode) {

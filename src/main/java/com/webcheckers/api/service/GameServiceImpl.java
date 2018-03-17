@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -24,7 +25,12 @@ public class GameServiceImpl implements GameService {
 
 	private Map<GameID, Game> games;
 	
-	public GameServiceImpl() {
+	private GameDestroyer gameDestroyer;
+	
+	@Autowired
+	public GameServiceImpl(GameDestroyer gameDestroyer) {
+		
+		this.gameDestroyer = gameDestroyer;
 		
 		games = new ConcurrentHashMap<>();
 		runDestroyer();
@@ -32,11 +38,10 @@ public class GameServiceImpl implements GameService {
 	
 	private void runDestroyer() {
 		
-		Runnable destroyer = new GameDestroyer();
-		((GameDestroyer)destroyer).initialize(games);
+		gameDestroyer.initialize(games);
 		
 		ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-	    executorService.scheduleAtFixedRate(destroyer, 0, GameDestroyer.RUN_INTERVAL, TimeUnit.MILLISECONDS);
+	    executorService.scheduleAtFixedRate(gameDestroyer, 0, GameDestroyerImpl.RUN_INTERVAL, TimeUnit.MILLISECONDS);
 	}
 	
 	@Override
@@ -304,7 +309,6 @@ public class GameServiceImpl implements GameService {
 		Game game = games.get(gameID);
 		try {
 			return game.invert(session);
-				
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
