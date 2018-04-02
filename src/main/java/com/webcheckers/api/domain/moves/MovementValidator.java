@@ -126,6 +126,9 @@ public class MovementValidator {
 			maxLength = Math.max(maxLength, path.getLength());
 		
 		int finalLength = maxLength;
+		if(finalLength <= 1)
+			possibilities.clear();
+		
 		possibilities.removeIf(path -> path.getLength() < finalLength);
 	}
 	
