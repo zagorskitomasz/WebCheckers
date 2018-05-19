@@ -76,12 +76,7 @@ public class GameServiceImpl implements GameService {
 			Game game = games.get(gameID);
 		
 			if(game == null) {
-				if(gamePersister.gameExists(gameID.NAME)) {
-					createGame(gameID, player);
-					return MsgCode.GAME_CREATED;
-				}
-				else
-					return MsgCode.GAME_NOT_EXIST;
+				return checkPersistedGame(gameID, player);
 			}
 		
 			if(samePlayer(gameID, player))
@@ -93,14 +88,36 @@ public class GameServiceImpl implements GameService {
 			if(!game.bothPlayersJoined())
 				return MsgCode.GAME_CREATED;
 		
-			game.start();
-			gamePersister.syncWithDB(gameID, game);
-			game.refreshCheckersList();
+			startGame(gameID, game);
 			return MsgCode.GAME_STARTED;
 		}
 		catch(Exception ex) {
 			return MsgCode.ERROR;
 		}
+	}
+	
+	private MsgCode checkPersistedGame(GameID gameID, Player player) {
+		
+		if(gamePersister.gameExists(gameID.NAME)) {
+			
+			Game game = new PolishChekersGame();
+			
+			if(game.create(player)) {
+				games.put(gameID, game);
+				return MsgCode.GAME_CREATED;
+			}
+			else
+				return MsgCode.ERROR;
+		}
+		else
+			return MsgCode.GAME_NOT_EXIST;
+	}
+
+	private void startGame(GameID gameID, Game game) {
+		
+		game.start();
+		gamePersister.syncWithDB(gameID, game);
+		game.refreshCheckersList();
 	}
 	
 	private boolean samePlayer(GameID gameID, Player player) {
