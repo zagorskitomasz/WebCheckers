@@ -5,12 +5,12 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.webcheckers.api.persistence.domain.LightGame;
 
-@Service
+@Component
 public class RestClientImpl implements RestClient{
 
 	private String WAKE_UP_URL = "https://webcheckersrest.herokuapp.com/state/wake-up/";

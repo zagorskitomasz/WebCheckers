@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.socket.WebSocketSession;
 
+import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.enums.MoveResult;
 import com.webcheckers.api.domain.moves.Position;
 
@@ -126,4 +127,8 @@ public interface Game {
 	public boolean bothPlayersJoined();
 
 	public boolean invert(WebSocketSession session);
+
+	public Board getBoard();
+
+	public void setMover(Color colorBySymbol);
 }

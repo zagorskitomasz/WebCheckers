@@ -19,6 +19,7 @@ import com.webcheckers.api.domain.game.Game;
 import com.webcheckers.api.domain.game.Player;
 import com.webcheckers.api.domain.game.PolishChekersGame;
 import com.webcheckers.api.domain.moves.Position;
+import com.webcheckers.api.persistence.GamePersister;
 
 @Service
 public class GameServiceImpl implements GameService {
@@ -26,6 +27,9 @@ public class GameServiceImpl implements GameService {
 	private Map<GameID, Game> games;
 	
 	private GameDestroyer gameDestroyer;
+	
+	@Autowired
+	private GamePersister gamePersister;
 	
 	@Autowired
 	public GameServiceImpl(GameDestroyer gameDestroyer) {
@@ -84,6 +88,7 @@ public class GameServiceImpl implements GameService {
 				return MsgCode.GAME_CREATED;
 		
 			game.start();
+			gamePersister.syncWithDB(gameID, game);
 			return MsgCode.GAME_STARTED;
 		}
 		catch(Exception ex) {
@@ -222,7 +227,18 @@ public class GameServiceImpl implements GameService {
 		
 		Game game = games.get(gameID);
 		try {
-			return game.move(position, session);
+			MoveResult result = game.move(position, session);
+			switch(result) {
+			case MOVE_COMPLETED:
+				gamePersister.saveState(gameID, game);
+				break;
+			case GAME_OVER:
+				gamePersister.archivise(gameID, game);
+				break;
+			default:
+				break;
+			}
+			return result;
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();

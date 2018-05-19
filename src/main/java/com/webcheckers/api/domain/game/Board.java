@@ -10,8 +10,8 @@ import com.webcheckers.api.domain.moves.Position;
 public class Board {
 
 	private Field[][] board;
-	private final int WIDTH = 10;
-	private final int HEIGHT = 10;
+	public final int WIDTH = 10;
+	public final int HEIGHT = 10;
 	private List<Checker> allCheckers;
 	private Random generator;
 	

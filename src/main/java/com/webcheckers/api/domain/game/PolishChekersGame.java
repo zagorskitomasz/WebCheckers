@@ -522,4 +522,16 @@ public class PolishChekersGame implements Game {
 		
 		invertRequest.reset();
 	}
+
+	@Override
+	public Board getBoard() {
+		
+		return board;
+	}
+
+	@Override
+	public void setMover(Color color) {
+		
+		active = getPlayerIndex(color);
+	}
 }
