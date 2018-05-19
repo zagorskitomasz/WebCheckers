@@ -131,4 +131,6 @@ public interface Game {
 	public Board getBoard();
 
 	public void setMover(Color colorBySymbol);
+
+	void refreshCheckersList();
 }

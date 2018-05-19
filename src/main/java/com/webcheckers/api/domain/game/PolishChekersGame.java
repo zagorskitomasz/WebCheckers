@@ -95,7 +95,7 @@ public class PolishChekersGame implements Game {
 		
 		if(gameNotInitialized())
 			initializeGame();
-		prepareInitialCheckers();
+		refreshCheckersList();
 		
 		message = "Game initialized. Default checkers are ready.";
 		
@@ -108,7 +108,7 @@ public class PolishChekersGame implements Game {
 		
 		assertInitialized();
 		
-		prepareInitialCheckers();
+		refreshCheckersList();
 	}
 
 	private void initializeObjects() {
@@ -135,8 +135,9 @@ public class PolishChekersGame implements Game {
 		defensiveCounter = new Integer[] {0, 0};
 	}
 	
-	private void prepareInitialCheckers() {
-		
+	@Override
+	public void refreshCheckersList() {
+
 		checkersToUpdate = board.getAllCheckers();
 	}
 

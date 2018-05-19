@@ -67,4 +67,15 @@ public class GamePersisterImpl implements GamePersister{
 		
 		restClient.saveGame(lightGame);
 	}
+
+	@Override
+	public boolean gameExists(String ID) {
+		try {
+			LightGame game = restClient.loadGame(Integer.parseInt(ID));
+			return game != null && game.getState() != null;
+		}
+		catch(Exception ex) {
+			return false;
+		}
+	}
 }

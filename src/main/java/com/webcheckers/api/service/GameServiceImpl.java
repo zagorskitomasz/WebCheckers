@@ -51,7 +51,7 @@ public class GameServiceImpl implements GameService {
 	@Override
 	public MsgCode createGame(GameID gameID, Player player) {
 		
-		if(games.containsKey(gameID))
+		if(games.containsKey(gameID) || gamePersister.gameExists(gameID.NAME))
 			return MsgCode.GAME_EXISTS;
 		
 		for(GameID ID : games.keySet()) {
@@ -75,8 +75,14 @@ public class GameServiceImpl implements GameService {
 		try {
 			Game game = games.get(gameID);
 		
-			if(game == null)
-				return MsgCode.GAME_NOT_EXIST;
+			if(game == null) {
+				if(gamePersister.gameExists(gameID.NAME)) {
+					createGame(gameID, player);
+					return MsgCode.GAME_CREATED;
+				}
+				else
+					return MsgCode.GAME_NOT_EXIST;
+			}
 		
 			if(samePlayer(gameID, player))
 				return MsgCode.ERROR;
@@ -89,6 +95,7 @@ public class GameServiceImpl implements GameService {
 		
 			game.start();
 			gamePersister.syncWithDB(gameID, game);
+			game.refreshCheckersList();
 			return MsgCode.GAME_STARTED;
 		}
 		catch(Exception ex) {
