@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.webcheckers.api.domain.enums.Color;
 import com.webcheckers.api.domain.game.Game;
+import com.webcheckers.api.persistence.domain.GameStarter;
 import com.webcheckers.api.persistence.domain.LightGame;
 import com.webcheckers.api.persistence.domain.LightGameFactory;
 import com.webcheckers.api.service.GameID;
@@ -26,7 +27,7 @@ public class GamePersisterImpl implements GamePersister{
 	synchronized public void syncWithDB(GameID gameID, Game game) {
 		
 		try {
-			LightGame lightGame = restClient.loadGame(Integer.parseInt(gameID.NAME));
+			LightGame lightGame = restClient.loadGame(gameID.NAME.hashCode());
 			
 			if(lightGame.getState() != null) {
 				
@@ -69,13 +70,18 @@ public class GamePersisterImpl implements GamePersister{
 	}
 
 	@Override
-	public boolean gameExists(String ID) {
+	public boolean gameExists(String name) {
 		try {
-			LightGame game = restClient.loadGame(Integer.parseInt(ID));
-			return game != null && game.getState() != null;
+			return restClient.loadGame(name.hashCode()) != null;
 		}
 		catch(Exception ex) {
 			return false;
 		}
+	}
+
+	@Override
+	synchronized public void createGame(GameID gameID) {
+		
+		restClient.createGame(new GameStarter(gameID.NAME.hashCode()));
 	}
 }

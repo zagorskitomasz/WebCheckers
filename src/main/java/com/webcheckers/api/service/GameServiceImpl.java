@@ -64,6 +64,8 @@ public class GameServiceImpl implements GameService {
 		
 		if(game.create(player)) {
 			games.put(gameID, game);
+			gamePersister.createGame(gameID);
+			
 			return MsgCode.GAME_CREATED;
 		}
 		return MsgCode.ERROR;

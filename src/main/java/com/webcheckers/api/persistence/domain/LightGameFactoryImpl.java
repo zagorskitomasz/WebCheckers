@@ -17,7 +17,7 @@ public class LightGameFactoryImpl implements LightGameFactory{
 		
 		try {
 			LightGame lightGame = new LightGame();
-			lightGame.setId(Integer.parseInt(ID));
+			lightGame.setId(ID.hashCode());
 			
 			lightGame.setState(buildState(game));
 			

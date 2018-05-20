@@ -1,5 +1,6 @@
 package com.webcheckers.api.persistence;
 
+import com.webcheckers.api.persistence.domain.GameStarter;
 import com.webcheckers.api.persistence.domain.LightGame;
 
 public interface RestClient {
@@ -11,4 +12,5 @@ public interface RestClient {
 	 * Method wakes up REST API, it returns true if API is available.
 	 */
 	public boolean wakeUp();
+	public boolean createGame(GameStarter gameStarter);
 }
