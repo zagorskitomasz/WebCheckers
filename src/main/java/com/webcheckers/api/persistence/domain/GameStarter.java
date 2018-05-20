@@ -12,6 +12,8 @@ public class GameStarter implements Serializable{
 		this.id = id;
 	}
 	
+	public GameStarter() {}
+	
 	public int getId() {
 		return id;
 	}
